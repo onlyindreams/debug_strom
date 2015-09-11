@@ -14,206 +14,206 @@ set datestyle to 'Postgres, MDY';
 -- timezone JST-9
 set timezone to 'JST-9';
 select key,max(timestamp_x) from strom_time_test group by key order by key;
- key  |           max            
-------+--------------------------
-    0 | Sun Sep 12 23:45:33 3976
-    1 | Mon Oct 05 22:07:55 3998
-    2 | Sat Aug 21 01:23:11 3954
-    3 | Wed Sep 01 12:34:22 3965
-    4 | Fri Jul 29 03:00:49 3932
-    5 | Tue Mar 23 01:59:56 3458
-    6 | Tue Jul 14 19:53:54 3215
-    7 | Sun Oct 15 11:21:14 3656
-    8 | Sun Jul 17 15:49:38 3921
-    9 | Wed Jul 06 04:38:27 3910
-   10 | Fri Apr 05 11:08:59 3822
+ key  |               max               
+------+---------------------------------
+    0 | Thu Sep 24 10:56:44.931428 3987
+    1 | Mon Aug 09 14:12:00.1395 3943
+    2 | Mon Mar 02 01:35:26.410777 3789
+    3 | Wed Jul 06 04:38:27.746319 3910
+    4 | Sun Apr 28 09:31:21.316321 3844
+    5 | Wed May 09 20:42:32.227029 3855
+    6 | Sat Aug 21 01:23:11.437518 3954
+    7 | Fri Jul 29 03:00:49.584935 3932
+    8 | Sun Sep 12 23:45:33.105919 3976
+    9 | Mon Oct 05 22:07:55.770963 3998
+   10 | Thu Mar 13 12:46:37.484466 3800
  1000 | 
 (12 rows)
 
 select key,max(timestamptz_x) from strom_time_test group by key order by key;
- key  |             max              
-------+------------------------------
-    0 | Mon Sep 13 15:45:33 3976 JST
-    1 | Tue Oct 06 14:07:55 3998 JST
-    2 | Sat Aug 21 17:23:11 3954 JST
-    3 | Thu Sep 02 04:34:22 3965 JST
-    4 | Fri Jul 29 19:00:49 3932 JST
-    5 | Tue Mar 23 17:59:56 3458 JST
-    6 | Wed Jul 15 11:53:54 3215 JST
-    7 | Mon Oct 16 03:21:14 3656 JST
-    8 | Mon Jul 18 07:49:38 3921 JST
-    9 | Wed Jul 06 20:38:27 3910 JST
-   10 | Sat Apr 06 03:08:59 3822 JST
+ key  |                 max                 
+------+-------------------------------------
+    0 | Fri Sep 25 02:56:44.931428 3987 JST
+    1 | Tue Aug 10 06:12:00.1395 3943 JST
+    2 | Mon Mar 02 18:35:26.410777 3789 JST
+    3 | Wed Jul 06 20:38:27.746319 3910 JST
+    4 | Mon Apr 29 01:31:21.316321 3844 JST
+    5 | Thu May 10 12:42:32.227029 3855 JST
+    6 | Sat Aug 21 17:23:11.437518 3954 JST
+    7 | Fri Jul 29 19:00:49.584935 3932 JST
+    8 | Mon Sep 13 15:45:33.105919 3976 JST
+    9 | Tue Oct 06 14:07:55.770963 3998 JST
+   10 | Fri Mar 14 04:46:37.484466 3800 JST
  1000 | Sun Mar 08 15:59:59 2015 JST
 (12 rows)
 
 select key,max(date_x) from strom_time_test group by key order by key;
  key  |    max     
 ------+------------
-    0 | 09-12-3976
-    1 | 10-05-3998
-    2 | 08-21-3954
-    3 | 09-01-3965
-    4 | 07-29-3932
-    5 | 03-23-3458
-    6 | 07-14-3215
-    7 | 10-15-3656
-    8 | 07-17-3921
-    9 | 07-06-3910
-   10 | 04-05-3822
+    0 | 09-24-3987
+    1 | 08-09-3943
+    2 | 03-02-3789
+    3 | 07-06-3910
+    4 | 04-28-3844
+    5 | 05-09-3855
+    6 | 08-21-3954
+    7 | 07-29-3932
+    8 | 09-12-3976
+    9 | 10-05-3998
+   10 | 03-13-3800
  1000 | 
 (12 rows)
 
 select key,max(time_x) from strom_time_test group by key order by key;
- key  |   max    
-------+----------
-    0 | 23:58:32
-    1 | 23:58:54
-    2 | 23:59:38
-    3 | 23:57:48
-    4 | 23:58:10
-    5 | 23:34:02
-    6 | 23:47:23
-    7 | 23:47:45
-    8 | 23:10:16
-    9 | 23:46:39
-   10 | 23:59:16
+ key  |       max       
+------+-----------------
+    0 | 23:46:17.70925
+    1 | 22:58:23.562943
+    2 | 23:58:32.416599
+    3 | 22:58:45.170876
+    4 | 23:33:40.266055
+    5 | 23:57:48.693837
+    6 | 23:58:54.482684
+    7 | 23:34:24.184712
+    8 | 23:46:39.266738
+    9 | 23:59:38.049984
+   10 | 23:23:15.782468
  1000 | 22:59:59
 (12 rows)
 
 select key,max(timetz_x) from strom_time_test group by key order by key;
- key  |     max     
-------+-------------
-    0 | 23:58:32-08
-    1 | 23:58:54-08
-    2 | 23:59:38-08
-    3 | 23:47:01-08
-    4 | 23:22:53-08
-    5 | 23:34:02-08
-    6 | 23:47:23-08
-    7 | 23:47:45-08
-    8 | 23:10:16-08
-    9 | 23:46:39-08
-   10 | 23:59:16-08
+ key  |        max         
+------+--------------------
+    0 | 23:46:17.70925-08
+    1 | 22:58:23.562943-08
+    2 | 23:58:32.416599-08
+    3 | 22:58:45.170876-08
+    4 | 22:46:30.292569-08
+    5 | 23:57:48.693837-07
+    6 | 23:58:54.482684-08
+    7 | 23:34:24.184712-08
+    8 | 23:46:39.266738-08
+    9 | 23:59:38.049984-08
+   10 | 23:23:15.782468-08
  1000 | 
 (12 rows)
 
 select key,max(interval_x) from strom_time_test group by key order by key;
- key  |                  max                   
-------+----------------------------------------
-    0 | @ 732932 days 6 hours 45 mins 33 secs
-    1 | @ 740990 days 5 hours 7 mins 55 secs
-    2 | @ 724873 days 8 hours 23 mins 11 secs
-    3 | @ 728902 days 19 hours 34 mins 22 secs
-    4 | @ 716815 days 10 hours 49 secs
-    5 | @ 543562 days 8 hours 59 mins 56 secs
-    6 | @ 454922 days 2 hours 53 mins 54 secs
-    7 | @ 616087 days 18 hours 21 mins 14 secs
-    8 | @ 712785 days 22 hours 49 mins 38 secs
-    9 | @ 708756 days 11 hours 38 mins 27 secs
-   10 | @ 676523 days 18 hours 8 mins 59 secs
+ key  |                      max                      
+------+-----------------------------------------------
+    0 | @ 736960 days 17 hours 56 mins 44.931428 secs
+    1 | @ 720843 days 21 hours 12 mins 0.1395 secs
+    2 | @ 664437 days 9 hours 35 mins 26.410777 secs
+    3 | @ 708756 days 11 hours 38 mins 27.746319 secs
+    4 | @ 684582 days 16 hours 31 mins 21.316321 secs
+    5 | @ 688611 days 3 hours 42 mins 32.227029 secs
+    6 | @ 724873 days 8 hours 23 mins 11.437518 secs
+    7 | @ 716815 days 10 hours 49.584935 secs
+    8 | @ 732932 days 6 hours 45 mins 33.105919 secs
+    9 | @ 740990 days 5 hours 7 mins 55.770963 secs
+   10 | @ 668465 days 19 hours 46 mins 37.484466 secs
  1000 | 
 (12 rows)
 
 select key,min(timestamp_x) from strom_time_test group by key order by key;
- key  |             min             
-------+-----------------------------
-    0 | Thu Jan 12 11:11:11 3989 BC
-    1 | Mon May 18 14:14:12 3868 BC
-    2 | Wed Apr 14 04:40:39 3901 BC
-    3 | Mon Jan 23 22:22:22 3978 BC
-    4 | Mon Jan 01 00:00:00 4000 BC
-    5 | Sat Apr 02 17:29:28 3912 BC
-    6 | Fri Jul 26 09:21:18 3802 BC
-    7 | Sat Jun 21 23:47:45 3835 BC
-    8 | Sat Feb 04 09:33:33 3967 BC
-    9 | Thu Mar 10 19:07:06 3934 BC
-   10 | Wed Feb 15 20:44:44 3956 BC
+ key  |                min                 
+------+------------------------------------
+    0 | Fri Jul 26 09:21:18.482895 3802 BC
+    1 | Wed Apr 14 04:40:39.928004 3901 BC
+    2 | Sat Jun 21 23:47:45.387283 3835 BC
+    3 | Sat Feb 04 09:33:33.74594 3967 BC
+    4 | Thu Jan 12 11:11:11.120229 3989 BC
+    5 | Thu Mar 10 19:07:06.366202 3934 BC
+    6 | Tue Jun 10 12:36:34.311426 3846 BC
+    7 | Mon Jan 01 00:00:00.097646 4000 BC
+    8 | Wed Feb 15 20:44:44.218017 3956 BC
+    9 | Sat Apr 25 15:51:50.553662 3890 BC
+   10 | Mon Jan 23 22:22:22.970948 3978 BC
  1000 | 
 (12 rows)
 
 select key,min(timestamptz_x) from strom_time_test group by key order by key;
- key  |               min               
-------+---------------------------------
-    0 | Fri Jan 13 04:11:11 3989 JST BC
-    1 | Tue May 19 07:14:12 3868 JST BC
-    2 | Wed Apr 14 21:40:39 3901 JST BC
-    3 | Tue Jan 24 15:22:22 3978 JST BC
-    4 | Mon Jan 01 17:00:00 4000 JST BC
-    5 | Sun Apr 03 10:29:28 3912 JST BC
-    6 | Sat Jul 27 02:21:18 3802 JST BC
-    7 | Sun Jun 22 16:47:45 3835 JST BC
-    8 | Sun Feb 05 02:33:33 3967 JST BC
-    9 | Fri Mar 11 12:07:06 3934 JST BC
-   10 | Thu Feb 16 13:44:44 3956 JST BC
+ key  |                  min                   
+------+----------------------------------------
+    0 | Sat Jul 27 02:21:18.482895 3802 JST BC
+    1 | Wed Apr 14 21:40:39.928004 3901 JST BC
+    2 | Sun Jun 22 16:47:45.387283 3835 JST BC
+    3 | Sun Feb 05 02:33:33.74594 3967 JST BC
+    4 | Fri Jan 13 04:11:11.120229 3989 JST BC
+    5 | Fri Mar 11 12:07:06.366202 3934 JST BC
+    6 | Wed Jun 11 05:36:34.311426 3846 JST BC
+    7 | Mon Jan 01 17:00:00.097646 4000 JST BC
+    8 | Thu Feb 16 13:44:44.218017 3956 JST BC
+    9 | Sun Apr 26 08:51:50.553662 3890 JST BC
+   10 | Tue Jan 24 15:22:22.970948 3978 JST BC
  1000 | Sun Mar 08 15:59:59 2015 JST
 (12 rows)
 
 select key,min(date_x) from strom_time_test group by key order by key;
  key  |      min      
 ------+---------------
-    0 | 01-12-3989 BC
-    1 | 05-18-3868 BC
-    2 | 04-14-3901 BC
-    3 | 01-23-3978 BC
-    4 | 01-01-4000 BC
-    5 | 04-02-3912 BC
-    6 | 07-26-3802 BC
-    7 | 06-21-3835 BC
-    8 | 02-04-3967 BC
-    9 | 03-10-3934 BC
-   10 | 02-15-3956 BC
+    0 | 07-26-3802 BC
+    1 | 04-14-3901 BC
+    2 | 06-21-3835 BC
+    3 | 02-04-3967 BC
+    4 | 01-12-3989 BC
+    5 | 03-10-3934 BC
+    6 | 06-10-3846 BC
+    7 | 01-01-4000 BC
+    8 | 02-15-3956 BC
+    9 | 04-25-3890 BC
+   10 | 01-23-3978 BC
  1000 | 
 (12 rows)
 
 select key,min(time_x) from strom_time_test group by key order by key;
- key  |   min    
-------+----------
-    0 | 00:11:31
-    1 | 00:22:18
-    2 | 01:11:18
-    3 | 00:11:53
-    4 | 00:00:00
-    5 | 01:00:31
-    6 | 00:10:47
-    7 | 00:48:38
-    8 | 00:11:09
-    9 | 00:10:25
-   10 | 00:24:08
+ key  |       min       
+------+-----------------
+    0 | 00:10:47.578178
+    1 | 01:12:24.652127
+    2 | 00:23:46.176864
+    3 | 00:11:53.665831
+    4 | 00:47:10.711367
+    5 | 00:10:25.002989
+    6 | 00:24:08.276443
+    7 | 00:00:00.097646
+    8 | 00:10:03.524977
+    9 | 00:11:31.751304
+   10 | 00:36:01.743472
  1000 | 22:59:59
 (12 rows)
 
 select key,min(timetz_x) from strom_time_test group by key order by key;
- key  |     min     
-------+-------------
-    0 | 00:11:31-08
-    1 | 00:22:18-07
-    2 | 01:11:18-07
-    3 | 00:11:53-08
-    4 | 00:10:03-07
-    5 | 01:59:56-07
-    6 | 00:10:47-08
-    7 | 01:35:48-07
-    8 | 00:34:33-07
-    9 | 00:10:25-08
-   10 | 00:24:08-08
+ key  |        min         
+------+--------------------
+    0 | 00:22:40.722473-07
+    1 | 01:59:56.026765-07
+    2 | 00:23:46.176864-08
+    3 | 00:22:18.241899-07
+    4 | 01:11:18.018111-07
+    5 | 00:10:25.002989-08
+    6 | 01:23:11.437518-07
+    7 | 00:00:00.097646-08
+    8 | 00:10:03.524977-07
+    9 | 00:11:31.751304-08
+   10 | 00:36:01.743472-08
  1000 | 
 (12 rows)
 
 select key,min(interval_x) from strom_time_test group by key order by key;
- key  |                     min                     
-------+---------------------------------------------
-    0 | @ 2176103 days 4 hours 48 mins 49 secs ago
-    1 | @ 2131782 days 1 hour 45 mins 48 secs ago
-    2 | @ 2143869 days 11 hours 19 mins 21 secs ago
-    3 | @ 2172073 days 17 hours 37 mins 38 secs ago
-    4 | @ 2180131 days 16 hours ago
-    5 | @ 2147897 days 22 hours 30 mins 32 secs ago
-    6 | @ 2107607 days 6 hours 38 mins 42 secs ago
-    7 | @ 2119694 days 16 hours 12 mins 15 secs ago
-    8 | @ 2168044 days 6 hours 26 mins 27 secs ago
-    9 | @ 2155956 days 20 hours 52 mins 54 secs ago
-   10 | @ 2164014 days 19 hours 15 mins 16 secs ago
+ key  |                        min                         
+------+----------------------------------------------------
+    0 | @ 2107607 days 6 hours 38 mins 41.517105 secs ago
+    1 | @ 2143869 days 11 hours 19 mins 20.071996 secs ago
+    2 | @ 2119694 days 16 hours 12 mins 14.612717 secs ago
+    3 | @ 2168044 days 6 hours 26 mins 26.25406 secs ago
+    4 | @ 2176103 days 4 hours 48 mins 48.879771 secs ago
+    5 | @ 2155956 days 20 hours 52 mins 53.633798 secs ago
+    6 | @ 2123724 days 3 hours 23 mins 25.688574 secs ago
+    7 | @ 2180131 days 15 hours 59 mins 59.902354 secs ago
+    8 | @ 2164014 days 19 hours 15 mins 15.781983 secs ago
+    9 | @ 2139841 days 8 mins 9.446338 secs ago
+   10 | @ 2172073 days 17 hours 37 mins 37.029052 secs ago
  1000 | 
 (12 rows)
 
@@ -322,47 +322,47 @@ select key,count(interval_x) from strom_time_test group by key order by key;
 select key,avg(time_x) from strom_time_test group by key order by key;
  key  |                avg                
 ------+-----------------------------------
-    0 | @ 11 hours 6 mins 11.469697 secs
-    1 | @ 12 hours 35 mins 34.136364 secs
-    2 | @ 12 hours 23 mins 9.666667 secs
-    3 | @ 13 hours 53 mins 50.484848 secs
-    4 | @ 11 hours 5 mins 56.19697 secs
-    5 | @ 13 hours 8 mins 57.015152 secs
-    6 | @ 12 hours 11 mins 45.075758 secs
-    7 | @ 12 hours 22 mins 12.515152 secs
-    8 | @ 11 hours 20 mins 1.030303 secs
-    9 | @ 11 hours 21 mins 50.060606 secs
-   10 | @ 11 hours 30 mins 26.666667 secs
+    0 | @ 9 hours 55 mins 0.507456 secs
+    1 | @ 11 hours 52 mins 39.307078 secs
+    2 | @ 12 hours 31 mins 55.231762 secs
+    3 | @ 11 hours 34 mins 37.98079 secs
+    4 | @ 11 hours 47 mins 7.371567 secs
+    5 | @ 12 hours 24 mins 54.728171 secs
+    6 | @ 12 hours 42 mins 45.161391 secs
+    7 | @ 13 hours 16 mins 45.183078 secs
+    8 | @ 11 hours 27 mins 22.596653 secs
+    9 | @ 12 hours 44 mins 21.060074 secs
+   10 | @ 12 hours 42 mins 30.594649 secs
  1000 | @ 22 hours 59 mins 59 secs
 (12 rows)
 
 select key,avg(interval_x) from strom_time_test group by key order by key;
  key  |                        avg                        
 ------+---------------------------------------------------
-    0 | @ 737762 days 11 hours 34 mins 43.075759 secs ago
-    1 | @ 590271 days 17 hours 5 mins 20.409089 secs ago
-    2 | @ 564936 days 24 hours 30 mins 28.515155 secs ago
-    3 | @ 667862 days 28 hours 29 mins 47.696971 secs ago
-    4 | @ 887206 days 13 hours 22 mins 14.712124 secs ago
-    5 | @ 719081 days 20 hours 27 mins 24.803032 secs ago
-    6 | @ 874630 days 17 hours 46 mins 25.833339 secs ago
-    7 | @ 768346 days 27 hours 2 mins 20.212118 secs ago
-    8 | @ 683979 days 14 hours 19 mins 4.42424 secs ago
-    9 | @ 642711 days 13 hours 13 mins 37.212118 secs ago
-   10 | @ 778480 days 24 hours 36 mins 49.696968 secs ago
+    0 | @ 730985 days 26 hours 35 mins 54.037998 secs ago
+    1 | @ 557916 days 15 hours 58.874744 secs ago
+    2 | @ 643993 days 11 hours 33 mins 32.040965 secs ago
+    3 | @ 684284 days 20 hours 59 mins 0.201029 secs ago
+    4 | @ 817673 days 12 hours 22 mins 52.62843 secs ago
+    5 | @ 666824 days 30 hours 39 mins 37.999102 secs ago
+    6 | @ 783547 days 26 hours 22 mins 42.111338 secs ago
+    7 | @ 757541 days 18 hours 1 min 25.726012 secs ago
+    8 | @ 626960 days 26 hours 35 mins 21.039708 secs ago
+    9 | @ 698142 days 16 hours 31 mins 6.212653 secs ago
+   10 | @ 947398 days 31 hours 45 mins 40.314443 secs ago
  1000 | 
 (12 rows)
 
 select max(timestamp_x) from strom_time_test;
-           max            
---------------------------
- Mon Oct 05 22:07:55 3998
+               max               
+---------------------------------
+ Mon Oct 05 22:07:55.770963 3998
 (1 row)
 
 select max(timestamptz_x) from strom_time_test;
-             max              
-------------------------------
- Tue Oct 06 14:07:55 3998 JST
+                 max                 
+-------------------------------------
+ Tue Oct 06 14:07:55.770963 3998 JST
 (1 row)
 
 select max(date_x) from strom_time_test;
@@ -372,33 +372,33 @@ select max(date_x) from strom_time_test;
 (1 row)
 
 select max(time_x) from strom_time_test;
-   max    
-----------
- 23:59:38
+       max       
+-----------------
+ 23:59:38.049984
 (1 row)
 
 select max(timetz_x) from strom_time_test;
-     max     
--------------
- 23:59:38-08
+        max         
+--------------------
+ 23:59:38.049984-08
 (1 row)
 
 select max(interval_x) from strom_time_test;
-                 max                  
---------------------------------------
- @ 740990 days 5 hours 7 mins 55 secs
+                     max                     
+---------------------------------------------
+ @ 740990 days 5 hours 7 mins 55.770963 secs
 (1 row)
 
 select min(timestamp_x) from strom_time_test;
-             min             
------------------------------
- Mon Jan 01 00:00:00 4000 BC
+                min                 
+------------------------------------
+ Mon Jan 01 00:00:00.097646 4000 BC
 (1 row)
 
 select min(timestamptz_x) from strom_time_test;
-               min               
----------------------------------
- Mon Jan 01 17:00:00 4000 JST BC
+                  min                   
+----------------------------------------
+ Mon Jan 01 17:00:00.097646 4000 JST BC
 (1 row)
 
 select min(date_x) from strom_time_test;
@@ -408,21 +408,21 @@ select min(date_x) from strom_time_test;
 (1 row)
 
 select min(time_x) from strom_time_test;
-   min    
-----------
- 00:00:00
+       min       
+-----------------
+ 00:00:00.097646
 (1 row)
 
 select min(timetz_x) from strom_time_test;
-     min     
--------------
- 00:10:03-07
+        min         
+--------------------
+ 00:10:03.524977-07
 (1 row)
 
 select min(interval_x) from strom_time_test;
-             min             
------------------------------
- @ 2180131 days 16 hours ago
+                        min                         
+----------------------------------------------------
+ @ 2180131 days 15 hours 59 mins 59.902354 secs ago
 (1 row)
 
 select count(timestamp_x) from strom_time_test;
@@ -464,218 +464,218 @@ select count(interval_x) from strom_time_test;
 select avg(time_x) from strom_time_test;
                 avg                
 -----------------------------------
- @ 13 hours 24 mins 41.265133 secs
+ @ 13 hours 24 mins 41.696969 secs
 (1 row)
 
 select avg(interval_x) from strom_time_test;
                        avg                        
 --------------------------------------------------
- @ 719570 days 6 hours 13 mins 28.780993 secs ago
+ @ 719570 days 6 hours 13 mins 28.289676 secs ago
 (1 row)
 
 -- timezone America/New_York
 set timezone to 'America/New_York';
 select key,max(timestamp_x) from strom_time_test group by key order by key;
- key  |           max            
-------+--------------------------
-    0 | Sun Sep 12 23:45:33 3976
-    1 | Mon Oct 05 22:07:55 3998
-    2 | Sat Aug 21 01:23:11 3954
-    3 | Wed Sep 01 12:34:22 3965
-    4 | Fri Jul 29 03:00:49 3932
-    5 | Tue Mar 23 01:59:56 3458
-    6 | Tue Jul 14 19:53:54 3215
-    7 | Sun Oct 15 11:21:14 3656
-    8 | Sun Jul 17 15:49:38 3921
-    9 | Wed Jul 06 04:38:27 3910
-   10 | Fri Apr 05 11:08:59 3822
+ key  |               max               
+------+---------------------------------
+    0 | Thu Sep 24 10:56:44.931428 3987
+    1 | Mon Aug 09 14:12:00.1395 3943
+    2 | Mon Mar 02 01:35:26.410777 3789
+    3 | Wed Jul 06 04:38:27.746319 3910
+    4 | Sun Apr 28 09:31:21.316321 3844
+    5 | Wed May 09 20:42:32.227029 3855
+    6 | Sat Aug 21 01:23:11.437518 3954
+    7 | Fri Jul 29 03:00:49.584935 3932
+    8 | Sun Sep 12 23:45:33.105919 3976
+    9 | Mon Oct 05 22:07:55.770963 3998
+   10 | Thu Mar 13 12:46:37.484466 3800
  1000 | 
 (12 rows)
 
 select key,max(timestamptz_x) from strom_time_test group by key order by key;
- key  |             max              
-------+------------------------------
-    0 | Mon Sep 13 02:45:33 3976 EDT
-    1 | Tue Oct 06 01:07:55 3998 EDT
-    2 | Sat Aug 21 04:23:11 3954 EDT
-    3 | Wed Sep 01 15:34:22 3965 EDT
-    4 | Fri Jul 29 06:00:49 3932 EDT
-    5 | Tue Mar 23 04:59:56 3458 EDT
-    6 | Tue Jul 14 22:53:54 3215 EDT
-    7 | Sun Oct 15 14:21:14 3656 EDT
-    8 | Sun Jul 17 18:49:38 3921 EDT
-    9 | Wed Jul 06 07:38:27 3910 EDT
-   10 | Fri Apr 05 14:08:59 3822 EDT
+ key  |                 max                 
+------+-------------------------------------
+    0 | Thu Sep 24 13:56:44.931428 3987 EDT
+    1 | Mon Aug 09 17:12:00.1395 3943 EDT
+    2 | Mon Mar 02 04:35:26.410777 3789 EST
+    3 | Wed Jul 06 07:38:27.746319 3910 EDT
+    4 | Sun Apr 28 12:31:21.316321 3844 EDT
+    5 | Wed May 09 23:42:32.227029 3855 EDT
+    6 | Sat Aug 21 04:23:11.437518 3954 EDT
+    7 | Fri Jul 29 06:00:49.584935 3932 EDT
+    8 | Mon Sep 13 02:45:33.105919 3976 EDT
+    9 | Tue Oct 06 01:07:55.770963 3998 EDT
+   10 | Thu Mar 13 15:46:37.484466 3800 EDT
  1000 | Sun Mar 08 01:59:59 2015 EST
 (12 rows)
 
 select key,max(date_x) from strom_time_test group by key order by key;
  key  |    max     
 ------+------------
-    0 | 09-12-3976
-    1 | 10-05-3998
-    2 | 08-21-3954
-    3 | 09-01-3965
-    4 | 07-29-3932
-    5 | 03-23-3458
-    6 | 07-14-3215
-    7 | 10-15-3656
-    8 | 07-17-3921
-    9 | 07-06-3910
-   10 | 04-05-3822
+    0 | 09-24-3987
+    1 | 08-09-3943
+    2 | 03-02-3789
+    3 | 07-06-3910
+    4 | 04-28-3844
+    5 | 05-09-3855
+    6 | 08-21-3954
+    7 | 07-29-3932
+    8 | 09-12-3976
+    9 | 10-05-3998
+   10 | 03-13-3800
  1000 | 
 (12 rows)
 
 select key,max(time_x) from strom_time_test group by key order by key;
- key  |   max    
-------+----------
-    0 | 23:58:32
-    1 | 23:58:54
-    2 | 23:59:38
-    3 | 23:57:48
-    4 | 23:58:10
-    5 | 23:34:02
-    6 | 23:47:23
-    7 | 23:47:45
-    8 | 23:10:16
-    9 | 23:46:39
-   10 | 23:59:16
+ key  |       max       
+------+-----------------
+    0 | 23:46:17.70925
+    1 | 22:58:23.562943
+    2 | 23:58:32.416599
+    3 | 22:58:45.170876
+    4 | 23:33:40.266055
+    5 | 23:57:48.693837
+    6 | 23:58:54.482684
+    7 | 23:34:24.184712
+    8 | 23:46:39.266738
+    9 | 23:59:38.049984
+   10 | 23:23:15.782468
  1000 | 22:59:59
 (12 rows)
 
 select key,max(timetz_x) from strom_time_test group by key order by key;
- key  |     max     
-------+-------------
-    0 | 23:58:32-08
-    1 | 23:58:54-08
-    2 | 23:59:38-08
-    3 | 23:47:01-08
-    4 | 23:22:53-08
-    5 | 23:34:02-08
-    6 | 23:47:23-08
-    7 | 23:47:45-08
-    8 | 23:10:16-08
-    9 | 23:46:39-08
-   10 | 23:59:16-08
+ key  |        max         
+------+--------------------
+    0 | 23:46:17.70925-08
+    1 | 22:58:23.562943-08
+    2 | 23:58:32.416599-08
+    3 | 22:58:45.170876-08
+    4 | 22:46:30.292569-08
+    5 | 23:57:48.693837-07
+    6 | 23:58:54.482684-08
+    7 | 23:34:24.184712-08
+    8 | 23:46:39.266738-08
+    9 | 23:59:38.049984-08
+   10 | 23:23:15.782468-08
  1000 | 
 (12 rows)
 
 select key,max(interval_x) from strom_time_test group by key order by key;
- key  |                  max                   
-------+----------------------------------------
-    0 | @ 732932 days 6 hours 45 mins 33 secs
-    1 | @ 740990 days 5 hours 7 mins 55 secs
-    2 | @ 724873 days 8 hours 23 mins 11 secs
-    3 | @ 728902 days 19 hours 34 mins 22 secs
-    4 | @ 716815 days 10 hours 49 secs
-    5 | @ 543562 days 8 hours 59 mins 56 secs
-    6 | @ 454922 days 2 hours 53 mins 54 secs
-    7 | @ 616087 days 18 hours 21 mins 14 secs
-    8 | @ 712785 days 22 hours 49 mins 38 secs
-    9 | @ 708756 days 11 hours 38 mins 27 secs
-   10 | @ 676523 days 18 hours 8 mins 59 secs
+ key  |                      max                      
+------+-----------------------------------------------
+    0 | @ 736960 days 17 hours 56 mins 44.931428 secs
+    1 | @ 720843 days 21 hours 12 mins 0.1395 secs
+    2 | @ 664437 days 9 hours 35 mins 26.410777 secs
+    3 | @ 708756 days 11 hours 38 mins 27.746319 secs
+    4 | @ 684582 days 16 hours 31 mins 21.316321 secs
+    5 | @ 688611 days 3 hours 42 mins 32.227029 secs
+    6 | @ 724873 days 8 hours 23 mins 11.437518 secs
+    7 | @ 716815 days 10 hours 49.584935 secs
+    8 | @ 732932 days 6 hours 45 mins 33.105919 secs
+    9 | @ 740990 days 5 hours 7 mins 55.770963 secs
+   10 | @ 668465 days 19 hours 46 mins 37.484466 secs
  1000 | 
 (12 rows)
 
 select key,min(timestamp_x) from strom_time_test group by key order by key;
- key  |             min             
-------+-----------------------------
-    0 | Thu Jan 12 11:11:11 3989 BC
-    1 | Mon May 18 14:14:12 3868 BC
-    2 | Wed Apr 14 04:40:39 3901 BC
-    3 | Mon Jan 23 22:22:22 3978 BC
-    4 | Mon Jan 01 00:00:00 4000 BC
-    5 | Sat Apr 02 17:29:28 3912 BC
-    6 | Fri Jul 26 09:21:18 3802 BC
-    7 | Sat Jun 21 23:47:45 3835 BC
-    8 | Sat Feb 04 09:33:33 3967 BC
-    9 | Thu Mar 10 19:07:06 3934 BC
-   10 | Wed Feb 15 20:44:44 3956 BC
+ key  |                min                 
+------+------------------------------------
+    0 | Fri Jul 26 09:21:18.482895 3802 BC
+    1 | Wed Apr 14 04:40:39.928004 3901 BC
+    2 | Sat Jun 21 23:47:45.387283 3835 BC
+    3 | Sat Feb 04 09:33:33.74594 3967 BC
+    4 | Thu Jan 12 11:11:11.120229 3989 BC
+    5 | Thu Mar 10 19:07:06.366202 3934 BC
+    6 | Tue Jun 10 12:36:34.311426 3846 BC
+    7 | Mon Jan 01 00:00:00.097646 4000 BC
+    8 | Wed Feb 15 20:44:44.218017 3956 BC
+    9 | Sat Apr 25 15:51:50.553662 3890 BC
+   10 | Mon Jan 23 22:22:22.970948 3978 BC
  1000 | 
 (12 rows)
 
 select key,min(timestamptz_x) from strom_time_test group by key order by key;
- key  |               min               
-------+---------------------------------
-    0 | Thu Jan 12 14:15:09 3989 LMT BC
-    1 | Mon May 18 17:18:10 3868 LMT BC
-    2 | Wed Apr 14 07:44:37 3901 LMT BC
-    3 | Tue Jan 24 01:26:20 3978 LMT BC
-    4 | Mon Jan 01 03:03:58 4000 LMT BC
-    5 | Sat Apr 02 20:33:26 3912 LMT BC
-    6 | Fri Jul 26 12:25:16 3802 LMT BC
-    7 | Sun Jun 22 02:51:43 3835 LMT BC
-    8 | Sat Feb 04 12:37:31 3967 LMT BC
-    9 | Thu Mar 10 22:11:04 3934 LMT BC
-   10 | Wed Feb 15 23:48:42 3956 LMT BC
+ key  |                  min                   
+------+----------------------------------------
+    0 | Fri Jul 26 12:25:16.482895 3802 LMT BC
+    1 | Wed Apr 14 07:44:37.928004 3901 LMT BC
+    2 | Sun Jun 22 02:51:43.387283 3835 LMT BC
+    3 | Sat Feb 04 12:37:31.74594 3967 LMT BC
+    4 | Thu Jan 12 14:15:09.120229 3989 LMT BC
+    5 | Thu Mar 10 22:11:04.366202 3934 LMT BC
+    6 | Tue Jun 10 15:40:32.311426 3846 LMT BC
+    7 | Mon Jan 01 03:03:58.097646 4000 LMT BC
+    8 | Wed Feb 15 23:48:42.218017 3956 LMT BC
+    9 | Sat Apr 25 18:55:48.553662 3890 LMT BC
+   10 | Tue Jan 24 01:26:20.970948 3978 LMT BC
  1000 | Sun Mar 08 01:59:59 2015 EST
 (12 rows)
 
 select key,min(date_x) from strom_time_test group by key order by key;
  key  |      min      
 ------+---------------
-    0 | 01-12-3989 BC
-    1 | 05-18-3868 BC
-    2 | 04-14-3901 BC
-    3 | 01-23-3978 BC
-    4 | 01-01-4000 BC
-    5 | 04-02-3912 BC
-    6 | 07-26-3802 BC
-    7 | 06-21-3835 BC
-    8 | 02-04-3967 BC
-    9 | 03-10-3934 BC
-   10 | 02-15-3956 BC
+    0 | 07-26-3802 BC
+    1 | 04-14-3901 BC
+    2 | 06-21-3835 BC
+    3 | 02-04-3967 BC
+    4 | 01-12-3989 BC
+    5 | 03-10-3934 BC
+    6 | 06-10-3846 BC
+    7 | 01-01-4000 BC
+    8 | 02-15-3956 BC
+    9 | 04-25-3890 BC
+   10 | 01-23-3978 BC
  1000 | 
 (12 rows)
 
 select key,min(time_x) from strom_time_test group by key order by key;
- key  |   min    
-------+----------
-    0 | 00:11:31
-    1 | 00:22:18
-    2 | 01:11:18
-    3 | 00:11:53
-    4 | 00:00:00
-    5 | 01:00:31
-    6 | 00:10:47
-    7 | 00:48:38
-    8 | 00:11:09
-    9 | 00:10:25
-   10 | 00:24:08
+ key  |       min       
+------+-----------------
+    0 | 00:10:47.578178
+    1 | 01:12:24.652127
+    2 | 00:23:46.176864
+    3 | 00:11:53.665831
+    4 | 00:47:10.711367
+    5 | 00:10:25.002989
+    6 | 00:24:08.276443
+    7 | 00:00:00.097646
+    8 | 00:10:03.524977
+    9 | 00:11:31.751304
+   10 | 00:36:01.743472
  1000 | 22:59:59
 (12 rows)
 
 select key,min(timetz_x) from strom_time_test group by key order by key;
- key  |     min     
-------+-------------
-    0 | 00:11:31-08
-    1 | 00:22:18-07
-    2 | 01:11:18-07
-    3 | 00:11:53-08
-    4 | 00:10:03-07
-    5 | 01:59:56-07
-    6 | 00:10:47-08
-    7 | 01:35:48-07
-    8 | 00:34:33-07
-    9 | 00:10:25-08
-   10 | 00:24:08-08
+ key  |        min         
+------+--------------------
+    0 | 00:22:40.722473-07
+    1 | 01:59:56.026765-07
+    2 | 00:23:46.176864-08
+    3 | 00:22:18.241899-07
+    4 | 01:11:18.018111-07
+    5 | 00:10:25.002989-08
+    6 | 01:23:11.437518-07
+    7 | 00:00:00.097646-08
+    8 | 00:10:03.524977-07
+    9 | 00:11:31.751304-08
+   10 | 00:36:01.743472-08
  1000 | 
 (12 rows)
 
 select key,min(interval_x) from strom_time_test group by key order by key;
- key  |                     min                     
-------+---------------------------------------------
-    0 | @ 2176103 days 4 hours 48 mins 49 secs ago
-    1 | @ 2131782 days 1 hour 45 mins 48 secs ago
-    2 | @ 2143869 days 11 hours 19 mins 21 secs ago
-    3 | @ 2172073 days 17 hours 37 mins 38 secs ago
-    4 | @ 2180131 days 16 hours ago
-    5 | @ 2147897 days 22 hours 30 mins 32 secs ago
-    6 | @ 2107607 days 6 hours 38 mins 42 secs ago
-    7 | @ 2119694 days 16 hours 12 mins 15 secs ago
-    8 | @ 2168044 days 6 hours 26 mins 27 secs ago
-    9 | @ 2155956 days 20 hours 52 mins 54 secs ago
-   10 | @ 2164014 days 19 hours 15 mins 16 secs ago
+ key  |                        min                         
+------+----------------------------------------------------
+    0 | @ 2107607 days 6 hours 38 mins 41.517105 secs ago
+    1 | @ 2143869 days 11 hours 19 mins 20.071996 secs ago
+    2 | @ 2119694 days 16 hours 12 mins 14.612717 secs ago
+    3 | @ 2168044 days 6 hours 26 mins 26.25406 secs ago
+    4 | @ 2176103 days 4 hours 48 mins 48.879771 secs ago
+    5 | @ 2155956 days 20 hours 52 mins 53.633798 secs ago
+    6 | @ 2123724 days 3 hours 23 mins 25.688574 secs ago
+    7 | @ 2180131 days 15 hours 59 mins 59.902354 secs ago
+    8 | @ 2164014 days 19 hours 15 mins 15.781983 secs ago
+    9 | @ 2139841 days 8 mins 9.446338 secs ago
+   10 | @ 2172073 days 17 hours 37 mins 37.029052 secs ago
  1000 | 
 (12 rows)
 
@@ -784,47 +784,47 @@ select key,count(interval_x) from strom_time_test group by key order by key;
 select key,avg(time_x) from strom_time_test group by key order by key;
  key  |                avg                
 ------+-----------------------------------
-    0 | @ 11 hours 6 mins 11.469697 secs
-    1 | @ 12 hours 35 mins 34.136364 secs
-    2 | @ 12 hours 23 mins 9.666667 secs
-    3 | @ 13 hours 53 mins 50.484848 secs
-    4 | @ 11 hours 5 mins 56.19697 secs
-    5 | @ 13 hours 8 mins 57.015152 secs
-    6 | @ 12 hours 11 mins 45.075758 secs
-    7 | @ 12 hours 22 mins 12.515152 secs
-    8 | @ 11 hours 20 mins 1.030303 secs
-    9 | @ 11 hours 21 mins 50.060606 secs
-   10 | @ 11 hours 30 mins 26.666667 secs
+    0 | @ 9 hours 55 mins 0.507456 secs
+    1 | @ 11 hours 52 mins 39.307078 secs
+    2 | @ 12 hours 31 mins 55.231762 secs
+    3 | @ 11 hours 34 mins 37.98079 secs
+    4 | @ 11 hours 47 mins 7.371567 secs
+    5 | @ 12 hours 24 mins 54.728171 secs
+    6 | @ 12 hours 42 mins 45.161391 secs
+    7 | @ 13 hours 16 mins 45.183078 secs
+    8 | @ 11 hours 27 mins 22.596653 secs
+    9 | @ 12 hours 44 mins 21.060074 secs
+   10 | @ 12 hours 42 mins 30.594649 secs
  1000 | @ 22 hours 59 mins 59 secs
 (12 rows)
 
 select key,avg(interval_x) from strom_time_test group by key order by key;
  key  |                        avg                        
 ------+---------------------------------------------------
-    0 | @ 737762 days 11 hours 34 mins 43.075759 secs ago
-    1 | @ 590271 days 17 hours 5 mins 20.409089 secs ago
-    2 | @ 564936 days 24 hours 30 mins 28.515155 secs ago
-    3 | @ 667862 days 28 hours 29 mins 47.696971 secs ago
-    4 | @ 887206 days 13 hours 22 mins 14.712124 secs ago
-    5 | @ 719081 days 20 hours 27 mins 24.803032 secs ago
-    6 | @ 874630 days 17 hours 46 mins 25.833339 secs ago
-    7 | @ 768346 days 27 hours 2 mins 20.212118 secs ago
-    8 | @ 683979 days 14 hours 19 mins 4.42424 secs ago
-    9 | @ 642711 days 13 hours 13 mins 37.212118 secs ago
-   10 | @ 778480 days 24 hours 36 mins 49.696968 secs ago
+    0 | @ 730985 days 26 hours 35 mins 54.037998 secs ago
+    1 | @ 557916 days 15 hours 58.874744 secs ago
+    2 | @ 643993 days 11 hours 33 mins 32.040965 secs ago
+    3 | @ 684284 days 20 hours 59 mins 0.201029 secs ago
+    4 | @ 817673 days 12 hours 22 mins 52.62843 secs ago
+    5 | @ 666824 days 30 hours 39 mins 37.999102 secs ago
+    6 | @ 783547 days 26 hours 22 mins 42.111338 secs ago
+    7 | @ 757541 days 18 hours 1 min 25.726012 secs ago
+    8 | @ 626960 days 26 hours 35 mins 21.039708 secs ago
+    9 | @ 698142 days 16 hours 31 mins 6.212653 secs ago
+   10 | @ 947398 days 31 hours 45 mins 40.314443 secs ago
  1000 | 
 (12 rows)
 
 select max(timestamp_x) from strom_time_test;
-           max            
---------------------------
- Mon Oct 05 22:07:55 3998
+               max               
+---------------------------------
+ Mon Oct 05 22:07:55.770963 3998
 (1 row)
 
 select max(timestamptz_x) from strom_time_test;
-             max              
-------------------------------
- Tue Oct 06 01:07:55 3998 EDT
+                 max                 
+-------------------------------------
+ Tue Oct 06 01:07:55.770963 3998 EDT
 (1 row)
 
 select max(date_x) from strom_time_test;
@@ -834,33 +834,33 @@ select max(date_x) from strom_time_test;
 (1 row)
 
 select max(time_x) from strom_time_test;
-   max    
-----------
- 23:59:38
+       max       
+-----------------
+ 23:59:38.049984
 (1 row)
 
 select max(timetz_x) from strom_time_test;
-     max     
--------------
- 23:59:38-08
+        max         
+--------------------
+ 23:59:38.049984-08
 (1 row)
 
 select max(interval_x) from strom_time_test;
-                 max                  
---------------------------------------
- @ 740990 days 5 hours 7 mins 55 secs
+                     max                     
+---------------------------------------------
+ @ 740990 days 5 hours 7 mins 55.770963 secs
 (1 row)
 
 select min(timestamp_x) from strom_time_test;
-             min             
------------------------------
- Mon Jan 01 00:00:00 4000 BC
+                min                 
+------------------------------------
+ Mon Jan 01 00:00:00.097646 4000 BC
 (1 row)
 
 select min(timestamptz_x) from strom_time_test;
-               min               
----------------------------------
- Mon Jan 01 03:03:58 4000 LMT BC
+                  min                   
+----------------------------------------
+ Mon Jan 01 03:03:58.097646 4000 LMT BC
 (1 row)
 
 select min(date_x) from strom_time_test;
@@ -870,21 +870,21 @@ select min(date_x) from strom_time_test;
 (1 row)
 
 select min(time_x) from strom_time_test;
-   min    
-----------
- 00:00:00
+       min       
+-----------------
+ 00:00:00.097646
 (1 row)
 
 select min(timetz_x) from strom_time_test;
-     min     
--------------
- 00:10:03-07
+        min         
+--------------------
+ 00:10:03.524977-07
 (1 row)
 
 select min(interval_x) from strom_time_test;
-             min             
------------------------------
- @ 2180131 days 16 hours ago
+                        min                         
+----------------------------------------------------
+ @ 2180131 days 15 hours 59 mins 59.902354 secs ago
 (1 row)
 
 select count(timestamp_x) from strom_time_test;
@@ -926,218 +926,218 @@ select count(interval_x) from strom_time_test;
 select avg(time_x) from strom_time_test;
                 avg                
 -----------------------------------
- @ 13 hours 24 mins 41.265133 secs
+ @ 13 hours 24 mins 41.696969 secs
 (1 row)
 
 select avg(interval_x) from strom_time_test;
                        avg                        
 --------------------------------------------------
- @ 719570 days 6 hours 13 mins 28.780993 secs ago
+ @ 719570 days 6 hours 13 mins 28.289676 secs ago
 (1 row)
 
 -- timezone Europe/Moscow
 set timezone to 'Europe/Moscow';
 select key,max(timestamp_x) from strom_time_test group by key order by key;
- key  |           max            
-------+--------------------------
-    0 | Sun Sep 12 23:45:33 3976
-    1 | Mon Oct 05 22:07:55 3998
-    2 | Sat Aug 21 01:23:11 3954
-    3 | Wed Sep 01 12:34:22 3965
-    4 | Fri Jul 29 03:00:49 3932
-    5 | Tue Mar 23 01:59:56 3458
-    6 | Tue Jul 14 19:53:54 3215
-    7 | Sun Oct 15 11:21:14 3656
-    8 | Sun Jul 17 15:49:38 3921
-    9 | Wed Jul 06 04:38:27 3910
-   10 | Fri Apr 05 11:08:59 3822
+ key  |               max               
+------+---------------------------------
+    0 | Thu Sep 24 10:56:44.931428 3987
+    1 | Mon Aug 09 14:12:00.1395 3943
+    2 | Mon Mar 02 01:35:26.410777 3789
+    3 | Wed Jul 06 04:38:27.746319 3910
+    4 | Sun Apr 28 09:31:21.316321 3844
+    5 | Wed May 09 20:42:32.227029 3855
+    6 | Sat Aug 21 01:23:11.437518 3954
+    7 | Fri Jul 29 03:00:49.584935 3932
+    8 | Sun Sep 12 23:45:33.105919 3976
+    9 | Mon Oct 05 22:07:55.770963 3998
+   10 | Thu Mar 13 12:46:37.484466 3800
  1000 | 
 (12 rows)
 
 select key,max(timestamptz_x) from strom_time_test group by key order by key;
- key  |             max              
-------+------------------------------
-    0 | Mon Sep 13 09:45:33 3976 MSK
-    1 | Tue Oct 06 08:07:55 3998 MSK
-    2 | Sat Aug 21 11:23:11 3954 MSK
-    3 | Wed Sep 01 22:34:22 3965 MSK
-    4 | Fri Jul 29 13:00:49 3932 MSK
-    5 | Tue Mar 23 11:59:56 3458 MSK
-    6 | Wed Jul 15 05:53:54 3215 MSK
-    7 | Sun Oct 15 21:21:14 3656 MSK
-    8 | Mon Jul 18 01:49:38 3921 MSK
-    9 | Wed Jul 06 14:38:27 3910 MSK
-   10 | Fri Apr 05 21:08:59 3822 MSK
+ key  |                 max                 
+------+-------------------------------------
+    0 | Thu Sep 24 20:56:44.931428 3987 MSK
+    1 | Tue Aug 10 00:12:00.1395 3943 MSK
+    2 | Mon Mar 02 12:35:26.410777 3789 MSK
+    3 | Wed Jul 06 14:38:27.746319 3910 MSK
+    4 | Sun Apr 28 19:31:21.316321 3844 MSK
+    5 | Thu May 10 06:42:32.227029 3855 MSK
+    6 | Sat Aug 21 11:23:11.437518 3954 MSK
+    7 | Fri Jul 29 13:00:49.584935 3932 MSK
+    8 | Mon Sep 13 09:45:33.105919 3976 MSK
+    9 | Tue Oct 06 08:07:55.770963 3998 MSK
+   10 | Thu Mar 13 22:46:37.484466 3800 MSK
  1000 | Sun Mar 08 09:59:59 2015 MSK
 (12 rows)
 
 select key,max(date_x) from strom_time_test group by key order by key;
  key  |    max     
 ------+------------
-    0 | 09-12-3976
-    1 | 10-05-3998
-    2 | 08-21-3954
-    3 | 09-01-3965
-    4 | 07-29-3932
-    5 | 03-23-3458
-    6 | 07-14-3215
-    7 | 10-15-3656
-    8 | 07-17-3921
-    9 | 07-06-3910
-   10 | 04-05-3822
+    0 | 09-24-3987
+    1 | 08-09-3943
+    2 | 03-02-3789
+    3 | 07-06-3910
+    4 | 04-28-3844
+    5 | 05-09-3855
+    6 | 08-21-3954
+    7 | 07-29-3932
+    8 | 09-12-3976
+    9 | 10-05-3998
+   10 | 03-13-3800
  1000 | 
 (12 rows)
 
 select key,max(time_x) from strom_time_test group by key order by key;
- key  |   max    
-------+----------
-    0 | 23:58:32
-    1 | 23:58:54
-    2 | 23:59:38
-    3 | 23:57:48
-    4 | 23:58:10
-    5 | 23:34:02
-    6 | 23:47:23
-    7 | 23:47:45
-    8 | 23:10:16
-    9 | 23:46:39
-   10 | 23:59:16
+ key  |       max       
+------+-----------------
+    0 | 23:46:17.70925
+    1 | 22:58:23.562943
+    2 | 23:58:32.416599
+    3 | 22:58:45.170876
+    4 | 23:33:40.266055
+    5 | 23:57:48.693837
+    6 | 23:58:54.482684
+    7 | 23:34:24.184712
+    8 | 23:46:39.266738
+    9 | 23:59:38.049984
+   10 | 23:23:15.782468
  1000 | 22:59:59
 (12 rows)
 
 select key,max(timetz_x) from strom_time_test group by key order by key;
- key  |     max     
-------+-------------
-    0 | 23:58:32-08
-    1 | 23:58:54-08
-    2 | 23:59:38-08
-    3 | 23:47:01-08
-    4 | 23:22:53-08
-    5 | 23:34:02-08
-    6 | 23:47:23-08
-    7 | 23:47:45-08
-    8 | 23:10:16-08
-    9 | 23:46:39-08
-   10 | 23:59:16-08
+ key  |        max         
+------+--------------------
+    0 | 23:46:17.70925-08
+    1 | 22:58:23.562943-08
+    2 | 23:58:32.416599-08
+    3 | 22:58:45.170876-08
+    4 | 22:46:30.292569-08
+    5 | 23:57:48.693837-07
+    6 | 23:58:54.482684-08
+    7 | 23:34:24.184712-08
+    8 | 23:46:39.266738-08
+    9 | 23:59:38.049984-08
+   10 | 23:23:15.782468-08
  1000 | 
 (12 rows)
 
 select key,max(interval_x) from strom_time_test group by key order by key;
- key  |                  max                   
-------+----------------------------------------
-    0 | @ 732932 days 6 hours 45 mins 33 secs
-    1 | @ 740990 days 5 hours 7 mins 55 secs
-    2 | @ 724873 days 8 hours 23 mins 11 secs
-    3 | @ 728902 days 19 hours 34 mins 22 secs
-    4 | @ 716815 days 10 hours 49 secs
-    5 | @ 543562 days 8 hours 59 mins 56 secs
-    6 | @ 454922 days 2 hours 53 mins 54 secs
-    7 | @ 616087 days 18 hours 21 mins 14 secs
-    8 | @ 712785 days 22 hours 49 mins 38 secs
-    9 | @ 708756 days 11 hours 38 mins 27 secs
-   10 | @ 676523 days 18 hours 8 mins 59 secs
+ key  |                      max                      
+------+-----------------------------------------------
+    0 | @ 736960 days 17 hours 56 mins 44.931428 secs
+    1 | @ 720843 days 21 hours 12 mins 0.1395 secs
+    2 | @ 664437 days 9 hours 35 mins 26.410777 secs
+    3 | @ 708756 days 11 hours 38 mins 27.746319 secs
+    4 | @ 684582 days 16 hours 31 mins 21.316321 secs
+    5 | @ 688611 days 3 hours 42 mins 32.227029 secs
+    6 | @ 724873 days 8 hours 23 mins 11.437518 secs
+    7 | @ 716815 days 10 hours 49.584935 secs
+    8 | @ 732932 days 6 hours 45 mins 33.105919 secs
+    9 | @ 740990 days 5 hours 7 mins 55.770963 secs
+   10 | @ 668465 days 19 hours 46 mins 37.484466 secs
  1000 | 
 (12 rows)
 
 select key,min(timestamp_x) from strom_time_test group by key order by key;
- key  |             min             
-------+-----------------------------
-    0 | Thu Jan 12 11:11:11 3989 BC
-    1 | Mon May 18 14:14:12 3868 BC
-    2 | Wed Apr 14 04:40:39 3901 BC
-    3 | Mon Jan 23 22:22:22 3978 BC
-    4 | Mon Jan 01 00:00:00 4000 BC
-    5 | Sat Apr 02 17:29:28 3912 BC
-    6 | Fri Jul 26 09:21:18 3802 BC
-    7 | Sat Jun 21 23:47:45 3835 BC
-    8 | Sat Feb 04 09:33:33 3967 BC
-    9 | Thu Mar 10 19:07:06 3934 BC
-   10 | Wed Feb 15 20:44:44 3956 BC
+ key  |                min                 
+------+------------------------------------
+    0 | Fri Jul 26 09:21:18.482895 3802 BC
+    1 | Wed Apr 14 04:40:39.928004 3901 BC
+    2 | Sat Jun 21 23:47:45.387283 3835 BC
+    3 | Sat Feb 04 09:33:33.74594 3967 BC
+    4 | Thu Jan 12 11:11:11.120229 3989 BC
+    5 | Thu Mar 10 19:07:06.366202 3934 BC
+    6 | Tue Jun 10 12:36:34.311426 3846 BC
+    7 | Mon Jan 01 00:00:00.097646 4000 BC
+    8 | Wed Feb 15 20:44:44.218017 3956 BC
+    9 | Sat Apr 25 15:51:50.553662 3890 BC
+   10 | Mon Jan 23 22:22:22.970948 3978 BC
  1000 | 
 (12 rows)
 
 select key,min(timestamptz_x) from strom_time_test group by key order by key;
- key  |               min               
-------+---------------------------------
-    0 | Thu Jan 12 21:41:28 3989 LMT BC
-    1 | Tue May 19 00:44:29 3868 LMT BC
-    2 | Wed Apr 14 15:10:56 3901 LMT BC
-    3 | Tue Jan 24 08:52:39 3978 LMT BC
-    4 | Mon Jan 01 10:30:17 4000 LMT BC
-    5 | Sun Apr 03 03:59:45 3912 LMT BC
-    6 | Fri Jul 26 19:51:35 3802 LMT BC
-    7 | Sun Jun 22 10:18:02 3835 LMT BC
-    8 | Sat Feb 04 20:03:50 3967 LMT BC
-    9 | Fri Mar 11 05:37:23 3934 LMT BC
-   10 | Thu Feb 16 07:15:01 3956 LMT BC
+ key  |                  min                   
+------+----------------------------------------
+    0 | Fri Jul 26 19:51:35.482895 3802 LMT BC
+    1 | Wed Apr 14 15:10:56.928004 3901 LMT BC
+    2 | Sun Jun 22 10:18:02.387283 3835 LMT BC
+    3 | Sat Feb 04 20:03:50.74594 3967 LMT BC
+    4 | Thu Jan 12 21:41:28.120229 3989 LMT BC
+    5 | Fri Mar 11 05:37:23.366202 3934 LMT BC
+    6 | Tue Jun 10 23:06:51.311426 3846 LMT BC
+    7 | Mon Jan 01 10:30:17.097646 4000 LMT BC
+    8 | Thu Feb 16 07:15:01.218017 3956 LMT BC
+    9 | Sun Apr 26 02:22:07.553662 3890 LMT BC
+   10 | Tue Jan 24 08:52:39.970948 3978 LMT BC
  1000 | Sun Mar 08 09:59:59 2015 MSK
 (12 rows)
 
 select key,min(date_x) from strom_time_test group by key order by key;
  key  |      min      
 ------+---------------
-    0 | 01-12-3989 BC
-    1 | 05-18-3868 BC
-    2 | 04-14-3901 BC
-    3 | 01-23-3978 BC
-    4 | 01-01-4000 BC
-    5 | 04-02-3912 BC
-    6 | 07-26-3802 BC
-    7 | 06-21-3835 BC
-    8 | 02-04-3967 BC
-    9 | 03-10-3934 BC
-   10 | 02-15-3956 BC
+    0 | 07-26-3802 BC
+    1 | 04-14-3901 BC
+    2 | 06-21-3835 BC
+    3 | 02-04-3967 BC
+    4 | 01-12-3989 BC
+    5 | 03-10-3934 BC
+    6 | 06-10-3846 BC
+    7 | 01-01-4000 BC
+    8 | 02-15-3956 BC
+    9 | 04-25-3890 BC
+   10 | 01-23-3978 BC
  1000 | 
 (12 rows)
 
 select key,min(time_x) from strom_time_test group by key order by key;
- key  |   min    
-------+----------
-    0 | 00:11:31
-    1 | 00:22:18
-    2 | 01:11:18
-    3 | 00:11:53
-    4 | 00:00:00
-    5 | 01:00:31
-    6 | 00:10:47
-    7 | 00:48:38
-    8 | 00:11:09
-    9 | 00:10:25
-   10 | 00:24:08
+ key  |       min       
+------+-----------------
+    0 | 00:10:47.578178
+    1 | 01:12:24.652127
+    2 | 00:23:46.176864
+    3 | 00:11:53.665831
+    4 | 00:47:10.711367
+    5 | 00:10:25.002989
+    6 | 00:24:08.276443
+    7 | 00:00:00.097646
+    8 | 00:10:03.524977
+    9 | 00:11:31.751304
+   10 | 00:36:01.743472
  1000 | 22:59:59
 (12 rows)
 
 select key,min(timetz_x) from strom_time_test group by key order by key;
- key  |     min     
-------+-------------
-    0 | 00:11:31-08
-    1 | 00:22:18-07
-    2 | 01:11:18-07
-    3 | 00:11:53-08
-    4 | 00:10:03-07
-    5 | 01:59:56-07
-    6 | 00:10:47-08
-    7 | 01:35:48-07
-    8 | 00:34:33-07
-    9 | 00:10:25-08
-   10 | 00:24:08-08
+ key  |        min         
+------+--------------------
+    0 | 00:22:40.722473-07
+    1 | 01:59:56.026765-07
+    2 | 00:23:46.176864-08
+    3 | 00:22:18.241899-07
+    4 | 01:11:18.018111-07
+    5 | 00:10:25.002989-08
+    6 | 01:23:11.437518-07
+    7 | 00:00:00.097646-08
+    8 | 00:10:03.524977-07
+    9 | 00:11:31.751304-08
+   10 | 00:36:01.743472-08
  1000 | 
 (12 rows)
 
 select key,min(interval_x) from strom_time_test group by key order by key;
- key  |                     min                     
-------+---------------------------------------------
-    0 | @ 2176103 days 4 hours 48 mins 49 secs ago
-    1 | @ 2131782 days 1 hour 45 mins 48 secs ago
-    2 | @ 2143869 days 11 hours 19 mins 21 secs ago
-    3 | @ 2172073 days 17 hours 37 mins 38 secs ago
-    4 | @ 2180131 days 16 hours ago
-    5 | @ 2147897 days 22 hours 30 mins 32 secs ago
-    6 | @ 2107607 days 6 hours 38 mins 42 secs ago
-    7 | @ 2119694 days 16 hours 12 mins 15 secs ago
-    8 | @ 2168044 days 6 hours 26 mins 27 secs ago
-    9 | @ 2155956 days 20 hours 52 mins 54 secs ago
-   10 | @ 2164014 days 19 hours 15 mins 16 secs ago
+ key  |                        min                         
+------+----------------------------------------------------
+    0 | @ 2107607 days 6 hours 38 mins 41.517105 secs ago
+    1 | @ 2143869 days 11 hours 19 mins 20.071996 secs ago
+    2 | @ 2119694 days 16 hours 12 mins 14.612717 secs ago
+    3 | @ 2168044 days 6 hours 26 mins 26.25406 secs ago
+    4 | @ 2176103 days 4 hours 48 mins 48.879771 secs ago
+    5 | @ 2155956 days 20 hours 52 mins 53.633798 secs ago
+    6 | @ 2123724 days 3 hours 23 mins 25.688574 secs ago
+    7 | @ 2180131 days 15 hours 59 mins 59.902354 secs ago
+    8 | @ 2164014 days 19 hours 15 mins 15.781983 secs ago
+    9 | @ 2139841 days 8 mins 9.446338 secs ago
+   10 | @ 2172073 days 17 hours 37 mins 37.029052 secs ago
  1000 | 
 (12 rows)
 
@@ -1246,47 +1246,47 @@ select key,count(interval_x) from strom_time_test group by key order by key;
 select key,avg(time_x) from strom_time_test group by key order by key;
  key  |                avg                
 ------+-----------------------------------
-    0 | @ 11 hours 6 mins 11.469697 secs
-    1 | @ 12 hours 35 mins 34.136364 secs
-    2 | @ 12 hours 23 mins 9.666667 secs
-    3 | @ 13 hours 53 mins 50.484848 secs
-    4 | @ 11 hours 5 mins 56.19697 secs
-    5 | @ 13 hours 8 mins 57.015152 secs
-    6 | @ 12 hours 11 mins 45.075758 secs
-    7 | @ 12 hours 22 mins 12.515152 secs
-    8 | @ 11 hours 20 mins 1.030303 secs
-    9 | @ 11 hours 21 mins 50.060606 secs
-   10 | @ 11 hours 30 mins 26.666667 secs
+    0 | @ 9 hours 55 mins 0.507456 secs
+    1 | @ 11 hours 52 mins 39.307078 secs
+    2 | @ 12 hours 31 mins 55.231762 secs
+    3 | @ 11 hours 34 mins 37.98079 secs
+    4 | @ 11 hours 47 mins 7.371567 secs
+    5 | @ 12 hours 24 mins 54.728171 secs
+    6 | @ 12 hours 42 mins 45.161391 secs
+    7 | @ 13 hours 16 mins 45.183078 secs
+    8 | @ 11 hours 27 mins 22.596653 secs
+    9 | @ 12 hours 44 mins 21.060074 secs
+   10 | @ 12 hours 42 mins 30.594649 secs
  1000 | @ 22 hours 59 mins 59 secs
 (12 rows)
 
 select key,avg(interval_x) from strom_time_test group by key order by key;
  key  |                        avg                        
 ------+---------------------------------------------------
-    0 | @ 737762 days 11 hours 34 mins 43.075759 secs ago
-    1 | @ 590271 days 17 hours 5 mins 20.409089 secs ago
-    2 | @ 564936 days 24 hours 30 mins 28.515155 secs ago
-    3 | @ 667862 days 28 hours 29 mins 47.696971 secs ago
-    4 | @ 887206 days 13 hours 22 mins 14.712124 secs ago
-    5 | @ 719081 days 20 hours 27 mins 24.803032 secs ago
-    6 | @ 874630 days 17 hours 46 mins 25.833339 secs ago
-    7 | @ 768346 days 27 hours 2 mins 20.212118 secs ago
-    8 | @ 683979 days 14 hours 19 mins 4.42424 secs ago
-    9 | @ 642711 days 13 hours 13 mins 37.212118 secs ago
-   10 | @ 778480 days 24 hours 36 mins 49.696968 secs ago
+    0 | @ 730985 days 26 hours 35 mins 54.037998 secs ago
+    1 | @ 557916 days 15 hours 58.874744 secs ago
+    2 | @ 643993 days 11 hours 33 mins 32.040965 secs ago
+    3 | @ 684284 days 20 hours 59 mins 0.201029 secs ago
+    4 | @ 817673 days 12 hours 22 mins 52.62843 secs ago
+    5 | @ 666824 days 30 hours 39 mins 37.999102 secs ago
+    6 | @ 783547 days 26 hours 22 mins 42.111338 secs ago
+    7 | @ 757541 days 18 hours 1 min 25.726012 secs ago
+    8 | @ 626960 days 26 hours 35 mins 21.039708 secs ago
+    9 | @ 698142 days 16 hours 31 mins 6.212653 secs ago
+   10 | @ 947398 days 31 hours 45 mins 40.314443 secs ago
  1000 | 
 (12 rows)
 
 select max(timestamp_x) from strom_time_test;
-           max            
---------------------------
- Mon Oct 05 22:07:55 3998
+               max               
+---------------------------------
+ Mon Oct 05 22:07:55.770963 3998
 (1 row)
 
 select max(timestamptz_x) from strom_time_test;
-             max              
-------------------------------
- Tue Oct 06 08:07:55 3998 MSK
+                 max                 
+-------------------------------------
+ Tue Oct 06 08:07:55.770963 3998 MSK
 (1 row)
 
 select max(date_x) from strom_time_test;
@@ -1296,33 +1296,33 @@ select max(date_x) from strom_time_test;
 (1 row)
 
 select max(time_x) from strom_time_test;
-   max    
-----------
- 23:59:38
+       max       
+-----------------
+ 23:59:38.049984
 (1 row)
 
 select max(timetz_x) from strom_time_test;
-     max     
--------------
- 23:59:38-08
+        max         
+--------------------
+ 23:59:38.049984-08
 (1 row)
 
 select max(interval_x) from strom_time_test;
-                 max                  
---------------------------------------
- @ 740990 days 5 hours 7 mins 55 secs
+                     max                     
+---------------------------------------------
+ @ 740990 days 5 hours 7 mins 55.770963 secs
 (1 row)
 
 select min(timestamp_x) from strom_time_test;
-             min             
------------------------------
- Mon Jan 01 00:00:00 4000 BC
+                min                 
+------------------------------------
+ Mon Jan 01 00:00:00.097646 4000 BC
 (1 row)
 
 select min(timestamptz_x) from strom_time_test;
-               min               
----------------------------------
- Mon Jan 01 10:30:17 4000 LMT BC
+                  min                   
+----------------------------------------
+ Mon Jan 01 10:30:17.097646 4000 LMT BC
 (1 row)
 
 select min(date_x) from strom_time_test;
@@ -1332,21 +1332,21 @@ select min(date_x) from strom_time_test;
 (1 row)
 
 select min(time_x) from strom_time_test;
-   min    
-----------
- 00:00:00
+       min       
+-----------------
+ 00:00:00.097646
 (1 row)
 
 select min(timetz_x) from strom_time_test;
-     min     
--------------
- 00:10:03-07
+        min         
+--------------------
+ 00:10:03.524977-07
 (1 row)
 
 select min(interval_x) from strom_time_test;
-             min             
------------------------------
- @ 2180131 days 16 hours ago
+                        min                         
+----------------------------------------------------
+ @ 2180131 days 15 hours 59 mins 59.902354 secs ago
 (1 row)
 
 select count(timestamp_x) from strom_time_test;
@@ -1388,12 +1388,12 @@ select count(interval_x) from strom_time_test;
 select avg(time_x) from strom_time_test;
                 avg                
 -----------------------------------
- @ 13 hours 24 mins 41.265133 secs
+ @ 13 hours 24 mins 41.696969 secs
 (1 row)
 
 select avg(interval_x) from strom_time_test;
                        avg                        
 --------------------------------------------------
- @ 719570 days 6 hours 13 mins 28.780993 secs ago
+ @ 719570 days 6 hours 13 mins 28.289676 secs ago
 (1 row)
 

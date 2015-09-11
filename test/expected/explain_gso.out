@@ -3835,7 +3835,7 @@ explain (verbose, costs off, timing off) select * from (select row_number() over
                      Pseudo Scan: t1.bigint_x::bigint, t2.bigint_x::bigint
                      Bulkload: On (density: 100.00%)
                      Depth 1: GpuNestLoop, JoinQual: (t1.bigint_x = t2.bigint_x)
-                              Nrows (in/out: 0.26%), KDS-Heap (size: 24.48KB, nbatches: 1)
+                              Nrows (in/out: 0.25%), KDS-Heap (size: 24.48KB, nbatches: 1)
                      Features: format: heap-tuple, bulkload: supported
                      ->  Custom Scan (BulkScan) on public.strom_test t2
                            Output: t2.id, t2.key, t2.smlint_x, t2.integer_x, t2.bigint_x, t2.real_x, t2.float_x, t2.nume_x, t2.smlsrl_x, t2.serial_x, t2.bigsrl_x
@@ -3863,7 +3863,7 @@ explain (verbose, costs off, timing off) select * from (select row_number() over
                      Pseudo Scan: t1.bigint_x::bigint, t2.bigint_x::bigint
                      Bulkload: On (density: 100.00%)
                      Depth 1: GpuNestLoop, JoinQual: (t1.bigint_x = t2.bigint_x)
-                              Nrows (in/out: 0.26%), KDS-Heap (size: 24.48KB, nbatches: 1)
+                              Nrows (in/out: 0.25%), KDS-Heap (size: 24.48KB, nbatches: 1)
                      Features: format: heap-tuple, bulkload: supported
                      ->  Custom Scan (BulkScan) on public.strom_test t2
                            Output: t2.id, t2.key, t2.smlint_x, t2.integer_x, t2.bigint_x, t2.real_x, t2.float_x, t2.nume_x, t2.smlsrl_x, t2.serial_x, t2.bigsrl_x
@@ -3947,7 +3947,7 @@ explain (verbose, costs off, timing off) select * from (select row_number() over
                      Pseudo Scan: t1.float_x::double precision, t2.float_x::double precision
                      Bulkload: On (density: 100.00%)
                      Depth 1: GpuNestLoop, JoinQual: (t1.float_x = t2.float_x)
-                              Nrows (in/out: 0.26%), KDS-Heap (size: 24.48KB, nbatches: 1)
+                              Nrows (in/out: 0.25%), KDS-Heap (size: 24.48KB, nbatches: 1)
                      Features: format: heap-tuple, bulkload: supported
                      ->  Custom Scan (BulkScan) on public.strom_test t2
                            Output: t2.id, t2.key, t2.smlint_x, t2.integer_x, t2.bigint_x, t2.real_x, t2.float_x, t2.nume_x, t2.smlsrl_x, t2.serial_x, t2.bigsrl_x
@@ -3975,7 +3975,7 @@ explain (verbose, costs off, timing off) select * from (select row_number() over
                      Pseudo Scan: t1.float_x::double precision, t2.float_x::double precision
                      Bulkload: On (density: 100.00%)
                      Depth 1: GpuNestLoop, JoinQual: (t1.float_x = t2.float_x)
-                              Nrows (in/out: 0.26%), KDS-Heap (size: 24.48KB, nbatches: 1)
+                              Nrows (in/out: 0.25%), KDS-Heap (size: 24.48KB, nbatches: 1)
                      Features: format: heap-tuple, bulkload: supported
                      ->  Custom Scan (BulkScan) on public.strom_test t2
                            Output: t2.id, t2.key, t2.smlint_x, t2.integer_x, t2.bigint_x, t2.real_x, t2.float_x, t2.nume_x, t2.smlsrl_x, t2.serial_x, t2.bigsrl_x
@@ -4003,7 +4003,7 @@ explain (verbose, costs off, timing off) select * from (select row_number() over
                      Pseudo Scan: t1.nume_x::numeric, t2.nume_x::numeric
                      Bulkload: On (density: 100.00%)
                      Depth 1: GpuNestLoop, JoinQual: (t1.nume_x = t2.nume_x)
-                              Nrows (in/out: 0.26%), KDS-Heap (size: 24.48KB, nbatches: 1)
+                              Nrows (in/out: 0.25%), KDS-Heap (size: 24.48KB, nbatches: 1)
                      Features: format: heap-tuple, bulkload: supported
                      ->  Custom Scan (BulkScan) on public.strom_test t2
                            Output: t2.id, t2.key, t2.smlint_x, t2.integer_x, t2.bigint_x, t2.real_x, t2.float_x, t2.nume_x, t2.smlsrl_x, t2.serial_x, t2.bigsrl_x
@@ -4031,7 +4031,7 @@ explain (verbose, costs off, timing off) select * from (select row_number() over
                      Pseudo Scan: t1.nume_x::numeric, t2.nume_x::numeric
                      Bulkload: On (density: 100.00%)
                      Depth 1: GpuNestLoop, JoinQual: (t1.nume_x = t2.nume_x)
-                              Nrows (in/out: 0.26%), KDS-Heap (size: 24.48KB, nbatches: 1)
+                              Nrows (in/out: 0.25%), KDS-Heap (size: 24.48KB, nbatches: 1)
                      Features: format: heap-tuple, bulkload: supported
                      ->  Custom Scan (BulkScan) on public.strom_test t2
                            Output: t2.id, t2.key, t2.smlint_x, t2.integer_x, t2.bigint_x, t2.real_x, t2.float_x, t2.nume_x, t2.smlsrl_x, t2.serial_x, t2.bigsrl_x

@@ -286,7 +286,7 @@ FROM
     SELECT generate_series
     ('4000-01-01 00:00:00 BC'::timestamp ,
      '4000-12-31 23:59:59 AD'::timestamp ,
-     '11 years 11days 11hours 11minutes 11 seconds'::interval)::timestamp with time zone as timesrc
+     '11 years 11days 11hours 11minutes 11 seconds'::interval)::timestamp with time zone + random()::text::interval as timesrc
     ORDER BY random()
   ) AS TM
 ) AS TM;

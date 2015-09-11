@@ -15,15 +15,15 @@ set datestyle to 'Postgres, MDY';
 -- timezone JST-9
 set timezone to 'JST-9';
 select rowid,timestamp_x from (select timestamp_x, row_number() over (order by timestamp_x asc ) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |         timestamp_x         
--------+-----------------------------
-   100 | Fri Feb 10 03:27:09 2908 BC
-   200 | Fri Apr 01 18:05:29 1805 BC
-   300 | Sat May 23 08:43:49 0702 BC
-   400 | Fri Jul 12 23:22:09 0402
-   500 | Fri Sep 01 14:00:29 1505
-   600 | Sat Oct 22 04:38:49 2608
-   700 | Fri Dec 11 19:17:09 3711
+ rowid |            timestamp_x             
+-------+------------------------------------
+   100 | Fri Feb 10 03:27:09.854119 2908 BC
+   200 | Fri Apr 01 18:05:29.977856 1805 BC
+   300 | Sat May 23 08:43:49.396147 0702 BC
+   400 | Fri Jul 12 23:22:09.140397 0402
+   500 | Fri Sep 01 14:00:29.968726 1505
+   600 | Sat Oct 22 04:38:49.619726 2608
+   700 | Fri Dec 11 19:17:09.683489 3711
    800 | 
    900 | 
   1000 | 
@@ -38,8 +38,8 @@ select rowid,timestamp_x from (select timestamp_x, row_number() over (order by t
 (18 rows)
 
 select rowid,timestamp_x from (select timestamp_x, row_number() over (order by timestamp_x asc NULLS FIRST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |         timestamp_x         
--------+-----------------------------
+ rowid |            timestamp_x             
+-------+------------------------------------
    100 | 
    200 | 
    300 | 
@@ -51,25 +51,25 @@ select rowid,timestamp_x from (select timestamp_x, row_number() over (order by t
    900 | 
   1000 | 
   1100 | 
-  1200 | Fri Feb 10 03:27:09 2908 BC
-  1300 | Fri Apr 01 18:05:29 1805 BC
-  1400 | Sat May 23 08:43:49 0702 BC
-  1500 | Fri Jul 12 23:22:09 0402
-  1600 | Fri Sep 01 14:00:29 1505
-  1700 | Sat Oct 22 04:38:49 2608
-  1800 | Fri Dec 11 19:17:09 3711
+  1200 | Fri Feb 10 03:27:09.854119 2908 BC
+  1300 | Fri Apr 01 18:05:29.977856 1805 BC
+  1400 | Sat May 23 08:43:49.396147 0702 BC
+  1500 | Fri Jul 12 23:22:09.140397 0402
+  1600 | Fri Sep 01 14:00:29.968726 1505
+  1700 | Sat Oct 22 04:38:49.619726 2608
+  1800 | Fri Dec 11 19:17:09.683489 3711
 (18 rows)
 
 select rowid,timestamp_x from (select timestamp_x, row_number() over (order by timestamp_x desc NULLS LAST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |         timestamp_x         
--------+-----------------------------
-   100 | Fri Aug 27 18:40:46 2906
-   200 | Fri Jul 08 04:02:26 1803
-   300 | Fri May 18 13:24:06 0700
-   400 | Fri Mar 28 22:45:46 0404 BC
-   500 | Fri Feb 05 08:07:26 1507 BC
-   600 | Thu Dec 16 17:29:06 2611 BC
-   700 | Wed Oct 26 02:50:46 3714 BC
+ rowid |            timestamp_x             
+-------+------------------------------------
+   100 | Fri Aug 27 18:40:46.697696 2906
+   200 | Fri Jul 08 04:02:26.129374 1803
+   300 | Fri May 18 13:24:06.280833 0700
+   400 | Fri Mar 28 22:45:46.886177 0404 BC
+   500 | Fri Feb 05 08:07:26.362964 1507 BC
+   600 | Thu Dec 16 17:29:06.961983 2611 BC
+   700 | Wed Oct 26 02:50:46.322547 3714 BC
    800 | 
    900 | 
   1000 | 
@@ -84,35 +84,35 @@ select rowid,timestamp_x from (select timestamp_x, row_number() over (order by t
 (18 rows)
 
 select * from ( select row_number() over () as rowid, timestamp_x from strom_time_test group by timestamp_x ) as t where t.rowid%50=0;
- rowid |         timestamp_x         
--------+-----------------------------
-    50 | Sun Jul 16 20:07:59 3460 BC
-   100 | Fri Feb 10 03:27:09 2908 BC
-   150 | Mon Sep 05 10:46:19 2357 BC
-   200 | Fri Apr 01 18:05:29 1805 BC
-   250 | Mon Oct 27 01:24:39 1254 BC
-   300 | Sat May 23 08:43:49 0702 BC
-   350 | Tue Dec 17 16:02:59 0151 BC
-   400 | Fri Jul 12 23:22:09 0402
-   450 | Wed Feb 06 06:41:19 0954
-   500 | Fri Sep 01 14:00:29 1505
-   550 | Wed Mar 28 21:19:39 2057
-   600 | Sat Oct 22 04:38:49 2608
-   650 | Wed May 18 11:57:59 3160
-   700 | Fri Dec 11 19:17:09 3711
+ rowid |            timestamp_x             
+-------+------------------------------------
+    50 | Sun Jul 16 20:07:59.299762 3460 BC
+   100 | Fri Feb 10 03:27:09.854119 2908 BC
+   150 | Mon Sep 05 10:46:19.698104 2357 BC
+   200 | Fri Apr 01 18:05:29.977856 1805 BC
+   250 | Mon Oct 27 01:24:39.644909 1254 BC
+   300 | Sat May 23 08:43:49.396147 0702 BC
+   350 | Tue Dec 17 16:02:59.220754 0151 BC
+   400 | Fri Jul 12 23:22:09.140397 0402
+   450 | Wed Feb 06 06:41:19.124906 0954
+   500 | Fri Sep 01 14:00:29.968726 1505
+   550 | Wed Mar 28 21:19:39.873632 2057
+   600 | Sat Oct 22 04:38:49.619726 2608
+   650 | Wed May 18 11:57:59.82895 3160
+   700 | Fri Dec 11 19:17:09.683489 3711
 (14 rows)
 
 select rowid,timestamptz_x from (select timestamptz_x, row_number() over (order by timestamptz_x asc ) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |          timestamptz_x          
--------+---------------------------------
-   100 | Fri Feb 10 20:27:09 2908 JST BC
-   200 | Sat Apr 02 11:05:29 1805 JST BC
-   300 | Sun May 24 01:43:49 0702 JST BC
-   400 | Sat Jul 13 16:22:09 0402 JST
-   500 | Sat Sep 02 07:00:29 1505 JST
+ rowid |             timestamptz_x              
+-------+----------------------------------------
+   100 | Fri Feb 10 20:27:09.854119 2908 JST BC
+   200 | Sat Apr 02 11:05:29.977856 1805 JST BC
+   300 | Sun May 24 01:43:49.396147 0702 JST BC
+   400 | Sat Jul 13 16:22:09.140397 0402 JST
+   500 | Sat Sep 02 07:00:29.968726 1505 JST
    600 | Sun Mar 08 15:59:59 2015 JST
-   700 | Sat Oct 22 20:38:49 2608 JST
-   800 | Sat Dec 12 12:17:09 3711 JST
+   700 | Sat Oct 22 20:38:49.619726 2608 JST
+   800 | Sat Dec 12 12:17:09.683489 3711 JST
    900 | 
   1000 | 
   1100 | 
@@ -126,8 +126,8 @@ select rowid,timestamptz_x from (select timestamptz_x, row_number() over (order 
 (18 rows)
 
 select rowid,timestamptz_x from (select timestamptz_x, row_number() over (order by timestamptz_x asc NULLS FIRST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |          timestamptz_x          
--------+---------------------------------
+ rowid |             timestamptz_x              
+-------+----------------------------------------
    100 | 
    200 | 
    300 | 
@@ -138,27 +138,27 @@ select rowid,timestamptz_x from (select timestamptz_x, row_number() over (order 
    800 | 
    900 | 
   1000 | 
-  1100 | Fri Feb 10 20:27:09 2908 JST BC
-  1200 | Sat Apr 02 11:05:29 1805 JST BC
-  1300 | Sun May 24 01:43:49 0702 JST BC
-  1400 | Sat Jul 13 16:22:09 0402 JST
-  1500 | Sat Sep 02 07:00:29 1505 JST
+  1100 | Fri Feb 10 20:27:09.854119 2908 JST BC
+  1200 | Sat Apr 02 11:05:29.977856 1805 JST BC
+  1300 | Sun May 24 01:43:49.396147 0702 JST BC
+  1400 | Sat Jul 13 16:22:09.140397 0402 JST
+  1500 | Sat Sep 02 07:00:29.968726 1505 JST
   1600 | Sun Mar 08 15:59:59 2015 JST
-  1700 | Sat Oct 22 20:38:49 2608 JST
-  1800 | Sat Dec 12 12:17:09 3711 JST
+  1700 | Sat Oct 22 20:38:49.619726 2608 JST
+  1800 | Sat Dec 12 12:17:09.683489 3711 JST
 (18 rows)
 
 select rowid,timestamptz_x from (select timestamptz_x, row_number() over (order by timestamptz_x desc NULLS LAST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |          timestamptz_x          
--------+---------------------------------
-   100 | Sat Aug 28 10:40:46 2906 JST
+ rowid |             timestamptz_x              
+-------+----------------------------------------
+   100 | Sat Aug 28 10:40:46.697696 2906 JST
    200 | Sun Mar 08 15:59:59 2015 JST
-   300 | Fri Jul 08 21:02:26 1803 JST
-   400 | Sat May 19 06:24:06 0700 JST
-   500 | Sat Mar 29 15:45:46 0404 JST BC
-   600 | Sat Feb 06 01:07:26 1507 JST BC
-   700 | Fri Dec 17 10:29:06 2611 JST BC
-   800 | Wed Oct 26 19:50:46 3714 JST BC
+   300 | Fri Jul 08 21:02:26.129374 1803 JST
+   400 | Sat May 19 06:24:06.280833 0700 JST
+   500 | Sat Mar 29 15:45:46.886177 0404 JST BC
+   600 | Sat Feb 06 01:07:26.362964 1507 JST BC
+   700 | Fri Dec 17 10:29:06.961983 2611 JST BC
+   800 | Wed Oct 26 19:50:46.322547 3714 JST BC
    900 | 
   1000 | 
   1100 | 
@@ -172,22 +172,22 @@ select rowid,timestamptz_x from (select timestamptz_x, row_number() over (order 
 (18 rows)
 
 select * from ( select row_number() over () as rowid, timestamptz_x from strom_time_test group by timestamptz_x ) as t where t.rowid%50=0;
- rowid |          timestamptz_x          
--------+---------------------------------
-    50 | Mon Jul 17 13:07:59 3460 JST BC
-   100 | Fri Feb 10 20:27:09 2908 JST BC
-   150 | Tue Sep 06 03:46:19 2357 JST BC
-   200 | Sat Apr 02 11:05:29 1805 JST BC
-   250 | Mon Oct 27 18:24:39 1254 JST BC
-   300 | Sun May 24 01:43:49 0702 JST BC
-   350 | Wed Dec 18 09:02:59 0151 JST BC
-   400 | Sat Jul 13 16:22:09 0402 JST
-   450 | Wed Feb 06 23:41:19 0954 JST
-   500 | Sat Sep 02 07:00:29 1505 JST
-   550 | Sun Mar 18 02:08:28 2046 JST
-   600 | Wed Oct 11 09:27:38 2597 JST
-   650 | Sat May 07 16:46:48 3149 JST
-   700 | Wed Dec 01 01:05:58 3700 JST
+ rowid |             timestamptz_x              
+-------+----------------------------------------
+    50 | Mon Jul 17 13:07:59.299762 3460 JST BC
+   100 | Fri Feb 10 20:27:09.854119 2908 JST BC
+   150 | Tue Sep 06 03:46:19.698104 2357 JST BC
+   200 | Sat Apr 02 11:05:29.977856 1805 JST BC
+   250 | Mon Oct 27 18:24:39.644909 1254 JST BC
+   300 | Sun May 24 01:43:49.396147 0702 JST BC
+   350 | Wed Dec 18 09:02:59.220754 0151 JST BC
+   400 | Sat Jul 13 16:22:09.140397 0402 JST
+   450 | Wed Feb 06 23:41:19.124906 0954 JST
+   500 | Sat Sep 02 07:00:29.968726 1505 JST
+   550 | Sun Mar 18 02:08:28.253527 2046 JST
+   600 | Wed Oct 11 09:27:38.073792 2597 JST
+   650 | Sat May 07 16:46:48.373047 3149 JST
+   700 | Wed Dec 01 01:05:58.647865 3700 JST
 (14 rows)
 
 select rowid,date_x from (select date_x, row_number() over (order by date_x asc ) as rowid from strom_time_test) as t where t.rowid%100=0;
@@ -279,16 +279,16 @@ select * from ( select row_number() over () as rowid, date_x from strom_time_tes
 (14 rows)
 
 select rowid,time_x from (select time_x, row_number() over (order by time_x asc ) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |  time_x  
--------+----------
-   100 | 03:25:19
-   200 | 06:41:19
-   300 | 09:57:19
-   400 | 13:12:57
-   500 | 16:39:00
-   600 | 19:55:00
+ rowid |     time_x      
+-------+-----------------
+   100 | 03:25:19.238982
+   200 | 06:41:19.124906
+   300 | 09:57:19.732426
+   400 | 13:12:57.57418
+   500 | 16:39:00.785794
+   600 | 19:55:00.340236
    700 | 22:59:59
-   800 | 23:10:38
+   800 | 23:10:38.569397
    900 | 
   1000 | 
   1100 | 
@@ -302,8 +302,8 @@ select rowid,time_x from (select time_x, row_number() over (order by time_x asc 
 (18 rows)
 
 select rowid,time_x from (select time_x, row_number() over (order by time_x asc NULLS FIRST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |  time_x  
--------+----------
+ rowid |     time_x      
+-------+-----------------
    100 | 
    200 | 
    300 | 
@@ -314,27 +314,27 @@ select rowid,time_x from (select time_x, row_number() over (order by time_x asc 
    800 | 
    900 | 
   1000 | 
-  1100 | 03:25:19
-  1200 | 06:41:19
-  1300 | 09:57:19
-  1400 | 13:12:57
-  1500 | 16:39:00
-  1600 | 19:55:00
+  1100 | 03:25:19.238982
+  1200 | 06:41:19.124906
+  1300 | 09:57:19.732426
+  1400 | 13:12:57.57418
+  1500 | 16:39:00.785794
+  1600 | 19:55:00.340236
   1700 | 22:59:59
-  1800 | 23:10:38
+  1800 | 23:10:38.569397
 (18 rows)
 
 select rowid,time_x from (select time_x, row_number() over (order by time_x desc NULLS LAST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |  time_x  
--------+----------
+ rowid |     time_x      
+-------+-----------------
    100 | 22:59:59
-   200 | 20:44:44
-   300 | 17:28:44
-   400 | 14:12:44
-   500 | 10:57:06
-   600 | 07:31:25
-   700 | 04:15:25
-   800 | 00:59:25
+   200 | 20:44:44.218017
+   300 | 17:28:44.463378
+   400 | 14:12:44.85711
+   500 | 10:57:06.979514
+   600 | 07:31:25.861473
+   700 | 04:15:25.301755
+   800 | 00:59:25.00497
    900 | 
   1000 | 
   1100 | 
@@ -348,34 +348,34 @@ select rowid,time_x from (select time_x, row_number() over (order by time_x desc
 (18 rows)
 
 select * from ( select row_number() over () as rowid, time_x from strom_time_test group by time_x ) as t where t.rowid%50=0;
- rowid |  time_x  
--------+----------
-    50 | 01:37:16
-   100 | 03:25:19
-   150 | 05:03:19
-   200 | 06:41:19
-   250 | 08:19:19
-   300 | 09:57:19
-   350 | 11:34:57
-   400 | 13:12:57
-   450 | 15:01:00
-   500 | 16:39:00
-   550 | 18:17:00
-   600 | 19:55:00
-   650 | 21:33:00
-   700 | 23:10:16
+ rowid |     time_x      
+-------+-----------------
+    50 | 01:37:16.71724
+   100 | 03:25:19.238982
+   150 | 05:03:19.100236
+   200 | 06:41:19.124906
+   250 | 08:19:19.039758
+   300 | 09:57:19.732426
+   350 | 11:34:57.568737
+   400 | 13:12:57.57418
+   450 | 15:01:00.683831
+   500 | 16:39:00.785794
+   550 | 18:17:00.592425
+   600 | 19:55:00.340236
+   650 | 21:33:00.123318
+   700 | 23:10:16.823918
 (14 rows)
 
 select rowid,timetz_x from (select timetz_x, row_number() over (order by timetz_x asc ) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |  timetz_x   
--------+-------------
-   100 | 03:13:48-08
-   200 | 07:29:35-07
-   300 | 09:45:26-08
-   400 | 13:11:51-08
-   500 | 16:27:29-08
-   600 | 19:43:29-08
-   700 | 22:58:45-08
+ rowid |      timetz_x      
+-------+--------------------
+   100 | 03:13:48.318379-08
+   200 | 07:29:35.574413-07
+   300 | 09:45:26.317605-08
+   400 | 13:11:51.939133-08
+   500 | 16:27:29.712007-08
+   600 | 19:43:29.76542-08
+   700 | 22:58:45.170876-08
    800 | 
    900 | 
   1000 | 
@@ -390,8 +390,8 @@ select rowid,timetz_x from (select timetz_x, row_number() over (order by timetz_
 (18 rows)
 
 select rowid,timetz_x from (select timetz_x, row_number() over (order by timetz_x asc NULLS FIRST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |  timetz_x   
--------+-------------
+ rowid |      timetz_x      
+-------+--------------------
    100 | 
    200 | 
    300 | 
@@ -403,25 +403,25 @@ select rowid,timetz_x from (select timetz_x, row_number() over (order by timetz_
    900 | 
   1000 | 
   1100 | 
-  1200 | 03:13:48-08
-  1300 | 07:29:35-07
-  1400 | 09:45:26-08
-  1500 | 13:11:51-08
-  1600 | 16:27:29-08
-  1700 | 19:43:29-08
-  1800 | 22:58:45-08
+  1200 | 03:13:48.318379-08
+  1300 | 07:29:35.574413-07
+  1400 | 09:45:26.317605-08
+  1500 | 13:11:51.939133-08
+  1600 | 16:27:29.712007-08
+  1700 | 19:43:29.76542-08
+  1800 | 22:58:45.170876-08
 (18 rows)
 
 select rowid,timetz_x from (select timetz_x, row_number() over (order by timetz_x desc NULLS LAST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |  timetz_x   
--------+-------------
-   100 | 20:43:16-08
-   200 | 17:16:29-08
-   300 | 14:01:13-08
-   400 | 10:45:13-08
-   500 | 07:19:10-08
-   600 | 04:03:10-08
-   700 | 00:47:54-08
+ rowid |      timetz_x      
+-------+--------------------
+   100 | 20:43:16.907735-08
+   200 | 17:16:29.037753-08
+   300 | 14:01:13.662515-08
+   400 | 10:45:13.962092-08
+   500 | 07:19:10.477353-08
+   600 | 04:03:10.184948-08
+   700 | 00:47:54.25861-08
    800 | 
    900 | 
   1000 | 
@@ -436,34 +436,34 @@ select rowid,timetz_x from (select timetz_x, row_number() over (order by timetz_
 (18 rows)
 
 select * from ( select row_number() over () as rowid, timetz_x from strom_time_test group by timetz_x ) as t where t.rowid%50=0;
- rowid |  timetz_x   
--------+-------------
-    50 | 01:25:23-08
-   100 | 03:13:48-08
-   150 | 05:51:57-07
-   200 | 07:29:35-07
-   250 | 08:07:26-08
-   300 | 09:45:26-08
-   350 | 11:34:13-08
-   400 | 13:11:51-08
-   450 | 14:49:29-08
-   500 | 16:27:29-08
-   550 | 18:05:29-08
-   600 | 19:43:29-08
-   650 | 21:21:07-08
-   700 | 22:58:45-08
+ rowid |      timetz_x      
+-------+--------------------
+    50 | 01:25:23.719053-08
+   100 | 03:13:48.318379-08
+   150 | 05:51:57.480354-07
+   200 | 07:29:35.574413-07
+   250 | 08:07:26.362964-08
+   300 | 09:45:26.317605-08
+   350 | 11:34:13.797992-08
+   400 | 13:11:51.939133-08
+   450 | 14:49:29.667852-08
+   500 | 16:27:29.712007-08
+   550 | 18:05:29.977856-08
+   600 | 19:43:29.76542-08
+   650 | 21:21:07.489952-08
+   700 | 22:58:45.170876-08
 (14 rows)
 
 select rowid,interval_x from (select interval_x, row_number() over (order by interval_x asc ) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |                 interval_x                  
--------+---------------------------------------------
-   100 | @ 1781246 days 12 hours 32 mins 51 secs ago
-   200 | @ 1378332 days 21 hours 54 mins 31 secs ago
-   300 | @ 975419 days 7 hours 16 mins 11 secs ago
-   400 | @ 572506 days 16 hours 37 mins 51 secs ago
-   500 | @ 169594 days 1 hour 59 mins 31 secs ago
-   600 | @ 233319 days 11 hours 38 mins 49 secs
-   700 | @ 636232 days 3 hours 17 mins 9 secs
+ rowid |                     interval_x                     
+-------+----------------------------------------------------
+   100 | @ 1781246 days 12 hours 32 mins 50.145881 secs ago
+   200 | @ 1378332 days 21 hours 54 mins 30.022144 secs ago
+   300 | @ 975419 days 7 hours 16 mins 10.603853 secs ago
+   400 | @ 572506 days 16 hours 37 mins 50.859603 secs ago
+   500 | @ 169594 days 1 hour 59 mins 30.031274 secs ago
+   600 | @ 233319 days 11 hours 38 mins 49.619726 secs
+   700 | @ 636232 days 3 hours 17 mins 9.683489 secs
    800 | 
    900 | 
   1000 | 
@@ -478,8 +478,8 @@ select rowid,interval_x from (select interval_x, row_number() over (order by int
 (18 rows)
 
 select rowid,interval_x from (select interval_x, row_number() over (order by interval_x asc NULLS FIRST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |                 interval_x                  
--------+---------------------------------------------
+ rowid |                     interval_x                     
+-------+----------------------------------------------------
    100 | 
    200 | 
    300 | 
@@ -491,25 +491,25 @@ select rowid,interval_x from (select interval_x, row_number() over (order by int
    900 | 
   1000 | 
   1100 | 
-  1200 | @ 1781246 days 12 hours 32 mins 51 secs ago
-  1300 | @ 1378332 days 21 hours 54 mins 31 secs ago
-  1400 | @ 975419 days 7 hours 16 mins 11 secs ago
-  1500 | @ 572506 days 16 hours 37 mins 51 secs ago
-  1600 | @ 169594 days 1 hour 59 mins 31 secs ago
-  1700 | @ 233319 days 11 hours 38 mins 49 secs
-  1800 | @ 636232 days 3 hours 17 mins 9 secs
+  1200 | @ 1781246 days 12 hours 32 mins 50.145881 secs ago
+  1300 | @ 1378332 days 21 hours 54 mins 30.022144 secs ago
+  1400 | @ 975419 days 7 hours 16 mins 10.603853 secs ago
+  1500 | @ 572506 days 16 hours 37 mins 50.859603 secs ago
+  1600 | @ 169594 days 1 hour 59 mins 30.031274 secs ago
+  1700 | @ 233319 days 11 hours 38 mins 49.619726 secs
+  1800 | @ 636232 days 3 hours 17 mins 9.683489 secs
 (18 rows)
 
 select rowid,interval_x from (select interval_x, row_number() over (order by interval_x desc NULLS LAST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |                 interval_x                  
--------+---------------------------------------------
-   100 | @ 342106 days 1 hour 40 mins 46 secs
-   200 | @ 60807 days 11 hours 57 mins 34 secs ago
-   300 | @ 463720 days 2 hours 35 mins 54 secs ago
-   400 | @ 866632 days 17 hours 14 mins 14 secs ago
-   500 | @ 1269546 days 7 hours 52 mins 34 secs ago
-   600 | @ 1672459 days 22 hours 30 mins 54 secs ago
-   700 | @ 2075374 days 13 hours 9 mins 14 secs ago
+ rowid |                     interval_x                     
+-------+----------------------------------------------------
+   100 | @ 342106 days 1 hour 40 mins 46.697696 secs
+   200 | @ 60807 days 11 hours 57 mins 33.870626 secs ago
+   300 | @ 463720 days 2 hours 35 mins 53.719167 secs ago
+   400 | @ 866632 days 17 hours 14 mins 13.113823 secs ago
+   500 | @ 1269546 days 7 hours 52 mins 33.637036 secs ago
+   600 | @ 1672459 days 22 hours 30 mins 53.038017 secs ago
+   700 | @ 2075374 days 13 hours 9 mins 13.677453 secs ago
    800 | 
    900 | 
   1000 | 
@@ -524,36 +524,36 @@ select rowid,interval_x from (select interval_x, row_number() over (order by int
 (18 rows)
 
 select * from ( select row_number() over () as rowid, interval_x from strom_time_test group by interval_x ) as t where t.rowid%50=0;
- rowid |                 interval_x                  
--------+---------------------------------------------
-    50 | @ 1982703 days 19 hours 52 mins 1 sec ago
-   100 | @ 1781246 days 12 hours 32 mins 51 secs ago
-   150 | @ 1579790 days 5 hours 13 mins 41 secs ago
-   200 | @ 1378332 days 21 hours 54 mins 31 secs ago
-   250 | @ 1176877 days 14 hours 35 mins 21 secs ago
-   300 | @ 975419 days 7 hours 16 mins 11 secs ago
-   350 | @ 773962 days 23 hours 57 mins 1 sec ago
-   400 | @ 572506 days 16 hours 37 mins 51 secs ago
-   450 | @ 371049 days 9 hours 18 mins 41 secs ago
-   500 | @ 169594 days 1 hour 59 mins 31 secs ago
-   550 | @ 31864 days 4 hours 19 mins 39 secs
-   600 | @ 233319 days 11 hours 38 mins 49 secs
-   650 | @ 434776 days 18 hours 57 mins 59 secs
-   700 | @ 636232 days 3 hours 17 mins 9 secs
+ rowid |                     interval_x                     
+-------+----------------------------------------------------
+    50 | @ 1982703 days 19 hours 52 mins 0.700238 secs ago
+   100 | @ 1781246 days 12 hours 32 mins 50.145881 secs ago
+   150 | @ 1579790 days 5 hours 13 mins 40.301896 secs ago
+   200 | @ 1378332 days 21 hours 54 mins 30.022144 secs ago
+   250 | @ 1176877 days 14 hours 35 mins 20.355091 secs ago
+   300 | @ 975419 days 7 hours 16 mins 10.603853 secs ago
+   350 | @ 773962 days 23 hours 57 mins 0.779246 secs ago
+   400 | @ 572506 days 16 hours 37 mins 50.859603 secs ago
+   450 | @ 371049 days 9 hours 18 mins 40.875094 secs ago
+   500 | @ 169594 days 1 hour 59 mins 30.031274 secs ago
+   550 | @ 31864 days 4 hours 19 mins 39.873632 secs
+   600 | @ 233319 days 11 hours 38 mins 49.619726 secs
+   650 | @ 434776 days 18 hours 57 mins 59.82895 secs
+   700 | @ 636232 days 3 hours 17 mins 9.683489 secs
 (14 rows)
 
 -- timezone America/New_York
 set timezone to 'America/New_York';
 select rowid,timestamp_x from (select timestamp_x, row_number() over (order by timestamp_x asc ) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |         timestamp_x         
--------+-----------------------------
-   100 | Fri Feb 10 03:27:09 2908 BC
-   200 | Fri Apr 01 18:05:29 1805 BC
-   300 | Sat May 23 08:43:49 0702 BC
-   400 | Fri Jul 12 23:22:09 0402
-   500 | Fri Sep 01 14:00:29 1505
-   600 | Sat Oct 22 04:38:49 2608
-   700 | Fri Dec 11 19:17:09 3711
+ rowid |            timestamp_x             
+-------+------------------------------------
+   100 | Fri Feb 10 03:27:09.854119 2908 BC
+   200 | Fri Apr 01 18:05:29.977856 1805 BC
+   300 | Sat May 23 08:43:49.396147 0702 BC
+   400 | Fri Jul 12 23:22:09.140397 0402
+   500 | Fri Sep 01 14:00:29.968726 1505
+   600 | Sat Oct 22 04:38:49.619726 2608
+   700 | Fri Dec 11 19:17:09.683489 3711
    800 | 
    900 | 
   1000 | 
@@ -568,8 +568,8 @@ select rowid,timestamp_x from (select timestamp_x, row_number() over (order by t
 (18 rows)
 
 select rowid,timestamp_x from (select timestamp_x, row_number() over (order by timestamp_x asc NULLS FIRST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |         timestamp_x         
--------+-----------------------------
+ rowid |            timestamp_x             
+-------+------------------------------------
    100 | 
    200 | 
    300 | 
@@ -581,25 +581,25 @@ select rowid,timestamp_x from (select timestamp_x, row_number() over (order by t
    900 | 
   1000 | 
   1100 | 
-  1200 | Fri Feb 10 03:27:09 2908 BC
-  1300 | Fri Apr 01 18:05:29 1805 BC
-  1400 | Sat May 23 08:43:49 0702 BC
-  1500 | Fri Jul 12 23:22:09 0402
-  1600 | Fri Sep 01 14:00:29 1505
-  1700 | Sat Oct 22 04:38:49 2608
-  1800 | Fri Dec 11 19:17:09 3711
+  1200 | Fri Feb 10 03:27:09.854119 2908 BC
+  1300 | Fri Apr 01 18:05:29.977856 1805 BC
+  1400 | Sat May 23 08:43:49.396147 0702 BC
+  1500 | Fri Jul 12 23:22:09.140397 0402
+  1600 | Fri Sep 01 14:00:29.968726 1505
+  1700 | Sat Oct 22 04:38:49.619726 2608
+  1800 | Fri Dec 11 19:17:09.683489 3711
 (18 rows)
 
 select rowid,timestamp_x from (select timestamp_x, row_number() over (order by timestamp_x desc NULLS LAST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |         timestamp_x         
--------+-----------------------------
-   100 | Fri Aug 27 18:40:46 2906
-   200 | Fri Jul 08 04:02:26 1803
-   300 | Fri May 18 13:24:06 0700
-   400 | Fri Mar 28 22:45:46 0404 BC
-   500 | Fri Feb 05 08:07:26 1507 BC
-   600 | Thu Dec 16 17:29:06 2611 BC
-   700 | Wed Oct 26 02:50:46 3714 BC
+ rowid |            timestamp_x             
+-------+------------------------------------
+   100 | Fri Aug 27 18:40:46.697696 2906
+   200 | Fri Jul 08 04:02:26.129374 1803
+   300 | Fri May 18 13:24:06.280833 0700
+   400 | Fri Mar 28 22:45:46.886177 0404 BC
+   500 | Fri Feb 05 08:07:26.362964 1507 BC
+   600 | Thu Dec 16 17:29:06.961983 2611 BC
+   700 | Wed Oct 26 02:50:46.322547 3714 BC
    800 | 
    900 | 
   1000 | 
@@ -614,35 +614,35 @@ select rowid,timestamp_x from (select timestamp_x, row_number() over (order by t
 (18 rows)
 
 select * from ( select row_number() over () as rowid, timestamp_x from strom_time_test group by timestamp_x ) as t where t.rowid%50=0;
- rowid |         timestamp_x         
--------+-----------------------------
-    50 | Sun Jul 16 20:07:59 3460 BC
-   100 | Fri Feb 10 03:27:09 2908 BC
-   150 | Mon Sep 05 10:46:19 2357 BC
-   200 | Fri Apr 01 18:05:29 1805 BC
-   250 | Mon Oct 27 01:24:39 1254 BC
-   300 | Sat May 23 08:43:49 0702 BC
-   350 | Tue Dec 17 16:02:59 0151 BC
-   400 | Fri Jul 12 23:22:09 0402
-   450 | Wed Feb 06 06:41:19 0954
-   500 | Fri Sep 01 14:00:29 1505
-   550 | Wed Mar 28 21:19:39 2057
-   600 | Sat Oct 22 04:38:49 2608
-   650 | Wed May 18 11:57:59 3160
-   700 | Fri Dec 11 19:17:09 3711
+ rowid |            timestamp_x             
+-------+------------------------------------
+    50 | Sun Jul 16 20:07:59.299762 3460 BC
+   100 | Fri Feb 10 03:27:09.854119 2908 BC
+   150 | Mon Sep 05 10:46:19.698104 2357 BC
+   200 | Fri Apr 01 18:05:29.977856 1805 BC
+   250 | Mon Oct 27 01:24:39.644909 1254 BC
+   300 | Sat May 23 08:43:49.396147 0702 BC
+   350 | Tue Dec 17 16:02:59.220754 0151 BC
+   400 | Fri Jul 12 23:22:09.140397 0402
+   450 | Wed Feb 06 06:41:19.124906 0954
+   500 | Fri Sep 01 14:00:29.968726 1505
+   550 | Wed Mar 28 21:19:39.873632 2057
+   600 | Sat Oct 22 04:38:49.619726 2608
+   650 | Wed May 18 11:57:59.82895 3160
+   700 | Fri Dec 11 19:17:09.683489 3711
 (14 rows)
 
 select rowid,timestamptz_x from (select timestamptz_x, row_number() over (order by timestamptz_x asc ) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |          timestamptz_x          
--------+---------------------------------
-   100 | Fri Feb 10 06:31:07 2908 LMT BC
-   200 | Fri Apr 01 21:09:27 1805 LMT BC
-   300 | Sat May 23 11:47:47 0702 LMT BC
-   400 | Sat Jul 13 02:26:07 0402 LMT
-   500 | Fri Sep 01 17:04:27 1505 LMT
+ rowid |             timestamptz_x              
+-------+----------------------------------------
+   100 | Fri Feb 10 06:31:07.854119 2908 LMT BC
+   200 | Fri Apr 01 21:09:27.977856 1805 LMT BC
+   300 | Sat May 23 11:47:47.396147 0702 LMT BC
+   400 | Sat Jul 13 02:26:07.140397 0402 LMT
+   500 | Fri Sep 01 17:04:27.968726 1505 LMT
    600 | Sun Mar 08 01:59:59 2015 EST
-   700 | Sat Oct 22 07:38:49 2608 EDT
-   800 | Fri Dec 11 22:17:09 3711 EST
+   700 | Sat Oct 22 07:38:49.619726 2608 EDT
+   800 | Fri Dec 11 22:17:09.683489 3711 EST
    900 | 
   1000 | 
   1100 | 
@@ -656,8 +656,8 @@ select rowid,timestamptz_x from (select timestamptz_x, row_number() over (order 
 (18 rows)
 
 select rowid,timestamptz_x from (select timestamptz_x, row_number() over (order by timestamptz_x asc NULLS FIRST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |          timestamptz_x          
--------+---------------------------------
+ rowid |             timestamptz_x              
+-------+----------------------------------------
    100 | 
    200 | 
    300 | 
@@ -668,27 +668,27 @@ select rowid,timestamptz_x from (select timestamptz_x, row_number() over (order 
    800 | 
    900 | 
   1000 | 
-  1100 | Fri Feb 10 06:31:07 2908 LMT BC
-  1200 | Fri Apr 01 21:09:27 1805 LMT BC
-  1300 | Sat May 23 11:47:47 0702 LMT BC
-  1400 | Sat Jul 13 02:26:07 0402 LMT
-  1500 | Fri Sep 01 17:04:27 1505 LMT
+  1100 | Fri Feb 10 06:31:07.854119 2908 LMT BC
+  1200 | Fri Apr 01 21:09:27.977856 1805 LMT BC
+  1300 | Sat May 23 11:47:47.396147 0702 LMT BC
+  1400 | Sat Jul 13 02:26:07.140397 0402 LMT
+  1500 | Fri Sep 01 17:04:27.968726 1505 LMT
   1600 | Sun Mar 08 01:59:59 2015 EST
-  1700 | Sat Oct 22 07:38:49 2608 EDT
-  1800 | Fri Dec 11 22:17:09 3711 EST
+  1700 | Sat Oct 22 07:38:49.619726 2608 EDT
+  1800 | Fri Dec 11 22:17:09.683489 3711 EST
 (18 rows)
 
 select rowid,timestamptz_x from (select timestamptz_x, row_number() over (order by timestamptz_x desc NULLS LAST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |          timestamptz_x          
--------+---------------------------------
-   100 | Fri Aug 27 21:40:46 2906 EDT
+ rowid |             timestamptz_x              
+-------+----------------------------------------
+   100 | Fri Aug 27 21:40:46.697696 2906 EDT
    200 | Sun Mar 08 01:59:59 2015 EST
-   300 | Fri Jul 08 07:06:24 1803 LMT
-   400 | Fri May 18 16:28:04 0700 LMT
-   500 | Sat Mar 29 01:49:44 0404 LMT BC
-   600 | Fri Feb 05 11:11:24 1507 LMT BC
-   700 | Thu Dec 16 20:33:04 2611 LMT BC
-   800 | Wed Oct 26 05:54:44 3714 LMT BC
+   300 | Fri Jul 08 07:06:24.129374 1803 LMT
+   400 | Fri May 18 16:28:04.280833 0700 LMT
+   500 | Sat Mar 29 01:49:44.886177 0404 LMT BC
+   600 | Fri Feb 05 11:11:24.362964 1507 LMT BC
+   700 | Thu Dec 16 20:33:04.961983 2611 LMT BC
+   800 | Wed Oct 26 05:54:44.322547 3714 LMT BC
    900 | 
   1000 | 
   1100 | 
@@ -702,22 +702,22 @@ select rowid,timestamptz_x from (select timestamptz_x, row_number() over (order 
 (18 rows)
 
 select * from ( select row_number() over () as rowid, timestamptz_x from strom_time_test group by timestamptz_x ) as t where t.rowid%50=0;
- rowid |          timestamptz_x          
--------+---------------------------------
-    50 | Sun Jul 16 23:11:57 3460 LMT BC
-   100 | Fri Feb 10 06:31:07 2908 LMT BC
-   150 | Mon Sep 05 13:50:17 2357 LMT BC
-   200 | Fri Apr 01 21:09:27 1805 LMT BC
-   250 | Mon Oct 27 04:28:37 1254 LMT BC
-   300 | Sat May 23 11:47:47 0702 LMT BC
-   350 | Tue Dec 17 19:06:57 0151 LMT BC
-   400 | Sat Jul 13 02:26:07 0402 LMT
-   450 | Wed Feb 06 09:45:17 0954 LMT
-   500 | Fri Sep 01 17:04:27 1505 LMT
-   550 | Sat Mar 17 13:08:28 2046 EDT
-   600 | Tue Oct 10 20:27:38 2597 EDT
-   650 | Sat May 07 03:46:48 3149 EDT
-   700 | Tue Nov 30 11:05:58 3700 EST
+ rowid |             timestamptz_x              
+-------+----------------------------------------
+    50 | Sun Jul 16 23:11:57.299762 3460 LMT BC
+   100 | Fri Feb 10 06:31:07.854119 2908 LMT BC
+   150 | Mon Sep 05 13:50:17.698104 2357 LMT BC
+   200 | Fri Apr 01 21:09:27.977856 1805 LMT BC
+   250 | Mon Oct 27 04:28:37.644909 1254 LMT BC
+   300 | Sat May 23 11:47:47.396147 0702 LMT BC
+   350 | Tue Dec 17 19:06:57.220754 0151 LMT BC
+   400 | Sat Jul 13 02:26:07.140397 0402 LMT
+   450 | Wed Feb 06 09:45:17.124906 0954 LMT
+   500 | Fri Sep 01 17:04:27.968726 1505 LMT
+   550 | Sat Mar 17 13:08:28.253527 2046 EDT
+   600 | Tue Oct 10 20:27:38.073792 2597 EDT
+   650 | Sat May 07 03:46:48.373047 3149 EDT
+   700 | Tue Nov 30 11:05:58.647865 3700 EST
 (14 rows)
 
 select rowid,date_x from (select date_x, row_number() over (order by date_x asc ) as rowid from strom_time_test) as t where t.rowid%100=0;
@@ -809,16 +809,16 @@ select * from ( select row_number() over () as rowid, date_x from strom_time_tes
 (14 rows)
 
 select rowid,time_x from (select time_x, row_number() over (order by time_x asc ) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |  time_x  
--------+----------
-   100 | 03:25:19
-   200 | 06:41:19
-   300 | 09:57:19
-   400 | 13:12:57
-   500 | 16:39:00
-   600 | 19:55:00
+ rowid |     time_x      
+-------+-----------------
+   100 | 03:25:19.238982
+   200 | 06:41:19.124906
+   300 | 09:57:19.732426
+   400 | 13:12:57.57418
+   500 | 16:39:00.785794
+   600 | 19:55:00.340236
    700 | 22:59:59
-   800 | 23:10:38
+   800 | 23:10:38.569397
    900 | 
   1000 | 
   1100 | 
@@ -832,8 +832,8 @@ select rowid,time_x from (select time_x, row_number() over (order by time_x asc 
 (18 rows)
 
 select rowid,time_x from (select time_x, row_number() over (order by time_x asc NULLS FIRST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |  time_x  
--------+----------
+ rowid |     time_x      
+-------+-----------------
    100 | 
    200 | 
    300 | 
@@ -844,27 +844,27 @@ select rowid,time_x from (select time_x, row_number() over (order by time_x asc 
    800 | 
    900 | 
   1000 | 
-  1100 | 03:25:19
-  1200 | 06:41:19
-  1300 | 09:57:19
-  1400 | 13:12:57
-  1500 | 16:39:00
-  1600 | 19:55:00
+  1100 | 03:25:19.238982
+  1200 | 06:41:19.124906
+  1300 | 09:57:19.732426
+  1400 | 13:12:57.57418
+  1500 | 16:39:00.785794
+  1600 | 19:55:00.340236
   1700 | 22:59:59
-  1800 | 23:10:38
+  1800 | 23:10:38.569397
 (18 rows)
 
 select rowid,time_x from (select time_x, row_number() over (order by time_x desc NULLS LAST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |  time_x  
--------+----------
+ rowid |     time_x      
+-------+-----------------
    100 | 22:59:59
-   200 | 20:44:44
-   300 | 17:28:44
-   400 | 14:12:44
-   500 | 10:57:06
-   600 | 07:31:25
-   700 | 04:15:25
-   800 | 00:59:25
+   200 | 20:44:44.218017
+   300 | 17:28:44.463378
+   400 | 14:12:44.85711
+   500 | 10:57:06.979514
+   600 | 07:31:25.861473
+   700 | 04:15:25.301755
+   800 | 00:59:25.00497
    900 | 
   1000 | 
   1100 | 
@@ -878,34 +878,34 @@ select rowid,time_x from (select time_x, row_number() over (order by time_x desc
 (18 rows)
 
 select * from ( select row_number() over () as rowid, time_x from strom_time_test group by time_x ) as t where t.rowid%50=0;
- rowid |  time_x  
--------+----------
-    50 | 01:37:16
-   100 | 03:25:19
-   150 | 05:03:19
-   200 | 06:41:19
-   250 | 08:19:19
-   300 | 09:57:19
-   350 | 11:34:57
-   400 | 13:12:57
-   450 | 15:01:00
-   500 | 16:39:00
-   550 | 18:17:00
-   600 | 19:55:00
-   650 | 21:33:00
-   700 | 23:10:16
+ rowid |     time_x      
+-------+-----------------
+    50 | 01:37:16.71724
+   100 | 03:25:19.238982
+   150 | 05:03:19.100236
+   200 | 06:41:19.124906
+   250 | 08:19:19.039758
+   300 | 09:57:19.732426
+   350 | 11:34:57.568737
+   400 | 13:12:57.57418
+   450 | 15:01:00.683831
+   500 | 16:39:00.785794
+   550 | 18:17:00.592425
+   600 | 19:55:00.340236
+   650 | 21:33:00.123318
+   700 | 23:10:16.823918
 (14 rows)
 
 select rowid,timetz_x from (select timetz_x, row_number() over (order by timetz_x asc ) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |  timetz_x   
--------+-------------
-   100 | 03:13:48-08
-   200 | 07:29:35-07
-   300 | 09:45:26-08
-   400 | 13:11:51-08
-   500 | 16:27:29-08
-   600 | 19:43:29-08
-   700 | 22:58:45-08
+ rowid |      timetz_x      
+-------+--------------------
+   100 | 03:13:48.318379-08
+   200 | 07:29:35.574413-07
+   300 | 09:45:26.317605-08
+   400 | 13:11:51.939133-08
+   500 | 16:27:29.712007-08
+   600 | 19:43:29.76542-08
+   700 | 22:58:45.170876-08
    800 | 
    900 | 
   1000 | 
@@ -920,8 +920,8 @@ select rowid,timetz_x from (select timetz_x, row_number() over (order by timetz_
 (18 rows)
 
 select rowid,timetz_x from (select timetz_x, row_number() over (order by timetz_x asc NULLS FIRST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |  timetz_x   
--------+-------------
+ rowid |      timetz_x      
+-------+--------------------
    100 | 
    200 | 
    300 | 
@@ -933,25 +933,25 @@ select rowid,timetz_x from (select timetz_x, row_number() over (order by timetz_
    900 | 
   1000 | 
   1100 | 
-  1200 | 03:13:48-08
-  1300 | 07:29:35-07
-  1400 | 09:45:26-08
-  1500 | 13:11:51-08
-  1600 | 16:27:29-08
-  1700 | 19:43:29-08
-  1800 | 22:58:45-08
+  1200 | 03:13:48.318379-08
+  1300 | 07:29:35.574413-07
+  1400 | 09:45:26.317605-08
+  1500 | 13:11:51.939133-08
+  1600 | 16:27:29.712007-08
+  1700 | 19:43:29.76542-08
+  1800 | 22:58:45.170876-08
 (18 rows)
 
 select rowid,timetz_x from (select timetz_x, row_number() over (order by timetz_x desc NULLS LAST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |  timetz_x   
--------+-------------
-   100 | 20:43:16-08
-   200 | 17:16:29-08
-   300 | 14:01:13-08
-   400 | 10:45:13-08
-   500 | 07:19:10-08
-   600 | 04:03:10-08
-   700 | 00:47:54-08
+ rowid |      timetz_x      
+-------+--------------------
+   100 | 20:43:16.907735-08
+   200 | 17:16:29.037753-08
+   300 | 14:01:13.662515-08
+   400 | 10:45:13.962092-08
+   500 | 07:19:10.477353-08
+   600 | 04:03:10.184948-08
+   700 | 00:47:54.25861-08
    800 | 
    900 | 
   1000 | 
@@ -966,34 +966,34 @@ select rowid,timetz_x from (select timetz_x, row_number() over (order by timetz_
 (18 rows)
 
 select * from ( select row_number() over () as rowid, timetz_x from strom_time_test group by timetz_x ) as t where t.rowid%50=0;
- rowid |  timetz_x   
--------+-------------
-    50 | 01:25:23-08
-   100 | 03:13:48-08
-   150 | 05:51:57-07
-   200 | 07:29:35-07
-   250 | 08:07:26-08
-   300 | 09:45:26-08
-   350 | 11:34:13-08
-   400 | 13:11:51-08
-   450 | 14:49:29-08
-   500 | 16:27:29-08
-   550 | 18:05:29-08
-   600 | 19:43:29-08
-   650 | 21:21:07-08
-   700 | 22:58:45-08
+ rowid |      timetz_x      
+-------+--------------------
+    50 | 01:25:23.719053-08
+   100 | 03:13:48.318379-08
+   150 | 05:51:57.480354-07
+   200 | 07:29:35.574413-07
+   250 | 08:07:26.362964-08
+   300 | 09:45:26.317605-08
+   350 | 11:34:13.797992-08
+   400 | 13:11:51.939133-08
+   450 | 14:49:29.667852-08
+   500 | 16:27:29.712007-08
+   550 | 18:05:29.977856-08
+   600 | 19:43:29.76542-08
+   650 | 21:21:07.489952-08
+   700 | 22:58:45.170876-08
 (14 rows)
 
 select rowid,interval_x from (select interval_x, row_number() over (order by interval_x asc ) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |                 interval_x                  
--------+---------------------------------------------
-   100 | @ 1781246 days 12 hours 32 mins 51 secs ago
-   200 | @ 1378332 days 21 hours 54 mins 31 secs ago
-   300 | @ 975419 days 7 hours 16 mins 11 secs ago
-   400 | @ 572506 days 16 hours 37 mins 51 secs ago
-   500 | @ 169594 days 1 hour 59 mins 31 secs ago
-   600 | @ 233319 days 11 hours 38 mins 49 secs
-   700 | @ 636232 days 3 hours 17 mins 9 secs
+ rowid |                     interval_x                     
+-------+----------------------------------------------------
+   100 | @ 1781246 days 12 hours 32 mins 50.145881 secs ago
+   200 | @ 1378332 days 21 hours 54 mins 30.022144 secs ago
+   300 | @ 975419 days 7 hours 16 mins 10.603853 secs ago
+   400 | @ 572506 days 16 hours 37 mins 50.859603 secs ago
+   500 | @ 169594 days 1 hour 59 mins 30.031274 secs ago
+   600 | @ 233319 days 11 hours 38 mins 49.619726 secs
+   700 | @ 636232 days 3 hours 17 mins 9.683489 secs
    800 | 
    900 | 
   1000 | 
@@ -1008,8 +1008,8 @@ select rowid,interval_x from (select interval_x, row_number() over (order by int
 (18 rows)
 
 select rowid,interval_x from (select interval_x, row_number() over (order by interval_x asc NULLS FIRST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |                 interval_x                  
--------+---------------------------------------------
+ rowid |                     interval_x                     
+-------+----------------------------------------------------
    100 | 
    200 | 
    300 | 
@@ -1021,25 +1021,25 @@ select rowid,interval_x from (select interval_x, row_number() over (order by int
    900 | 
   1000 | 
   1100 | 
-  1200 | @ 1781246 days 12 hours 32 mins 51 secs ago
-  1300 | @ 1378332 days 21 hours 54 mins 31 secs ago
-  1400 | @ 975419 days 7 hours 16 mins 11 secs ago
-  1500 | @ 572506 days 16 hours 37 mins 51 secs ago
-  1600 | @ 169594 days 1 hour 59 mins 31 secs ago
-  1700 | @ 233319 days 11 hours 38 mins 49 secs
-  1800 | @ 636232 days 3 hours 17 mins 9 secs
+  1200 | @ 1781246 days 12 hours 32 mins 50.145881 secs ago
+  1300 | @ 1378332 days 21 hours 54 mins 30.022144 secs ago
+  1400 | @ 975419 days 7 hours 16 mins 10.603853 secs ago
+  1500 | @ 572506 days 16 hours 37 mins 50.859603 secs ago
+  1600 | @ 169594 days 1 hour 59 mins 30.031274 secs ago
+  1700 | @ 233319 days 11 hours 38 mins 49.619726 secs
+  1800 | @ 636232 days 3 hours 17 mins 9.683489 secs
 (18 rows)
 
 select rowid,interval_x from (select interval_x, row_number() over (order by interval_x desc NULLS LAST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |                 interval_x                  
--------+---------------------------------------------
-   100 | @ 342106 days 1 hour 40 mins 46 secs
-   200 | @ 60807 days 11 hours 57 mins 34 secs ago
-   300 | @ 463720 days 2 hours 35 mins 54 secs ago
-   400 | @ 866632 days 17 hours 14 mins 14 secs ago
-   500 | @ 1269546 days 7 hours 52 mins 34 secs ago
-   600 | @ 1672459 days 22 hours 30 mins 54 secs ago
-   700 | @ 2075374 days 13 hours 9 mins 14 secs ago
+ rowid |                     interval_x                     
+-------+----------------------------------------------------
+   100 | @ 342106 days 1 hour 40 mins 46.697696 secs
+   200 | @ 60807 days 11 hours 57 mins 33.870626 secs ago
+   300 | @ 463720 days 2 hours 35 mins 53.719167 secs ago
+   400 | @ 866632 days 17 hours 14 mins 13.113823 secs ago
+   500 | @ 1269546 days 7 hours 52 mins 33.637036 secs ago
+   600 | @ 1672459 days 22 hours 30 mins 53.038017 secs ago
+   700 | @ 2075374 days 13 hours 9 mins 13.677453 secs ago
    800 | 
    900 | 
   1000 | 
@@ -1054,36 +1054,36 @@ select rowid,interval_x from (select interval_x, row_number() over (order by int
 (18 rows)
 
 select * from ( select row_number() over () as rowid, interval_x from strom_time_test group by interval_x ) as t where t.rowid%50=0;
- rowid |                 interval_x                  
--------+---------------------------------------------
-    50 | @ 1982703 days 19 hours 52 mins 1 sec ago
-   100 | @ 1781246 days 12 hours 32 mins 51 secs ago
-   150 | @ 1579790 days 5 hours 13 mins 41 secs ago
-   200 | @ 1378332 days 21 hours 54 mins 31 secs ago
-   250 | @ 1176877 days 14 hours 35 mins 21 secs ago
-   300 | @ 975419 days 7 hours 16 mins 11 secs ago
-   350 | @ 773962 days 23 hours 57 mins 1 sec ago
-   400 | @ 572506 days 16 hours 37 mins 51 secs ago
-   450 | @ 371049 days 9 hours 18 mins 41 secs ago
-   500 | @ 169594 days 1 hour 59 mins 31 secs ago
-   550 | @ 31864 days 4 hours 19 mins 39 secs
-   600 | @ 233319 days 11 hours 38 mins 49 secs
-   650 | @ 434776 days 18 hours 57 mins 59 secs
-   700 | @ 636232 days 3 hours 17 mins 9 secs
+ rowid |                     interval_x                     
+-------+----------------------------------------------------
+    50 | @ 1982703 days 19 hours 52 mins 0.700238 secs ago
+   100 | @ 1781246 days 12 hours 32 mins 50.145881 secs ago
+   150 | @ 1579790 days 5 hours 13 mins 40.301896 secs ago
+   200 | @ 1378332 days 21 hours 54 mins 30.022144 secs ago
+   250 | @ 1176877 days 14 hours 35 mins 20.355091 secs ago
+   300 | @ 975419 days 7 hours 16 mins 10.603853 secs ago
+   350 | @ 773962 days 23 hours 57 mins 0.779246 secs ago
+   400 | @ 572506 days 16 hours 37 mins 50.859603 secs ago
+   450 | @ 371049 days 9 hours 18 mins 40.875094 secs ago
+   500 | @ 169594 days 1 hour 59 mins 30.031274 secs ago
+   550 | @ 31864 days 4 hours 19 mins 39.873632 secs
+   600 | @ 233319 days 11 hours 38 mins 49.619726 secs
+   650 | @ 434776 days 18 hours 57 mins 59.82895 secs
+   700 | @ 636232 days 3 hours 17 mins 9.683489 secs
 (14 rows)
 
 -- timezone Europe/Moscow
 set timezone to 'Europe/Moscow';
 select rowid,timestamp_x from (select timestamp_x, row_number() over (order by timestamp_x asc ) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |         timestamp_x         
--------+-----------------------------
-   100 | Fri Feb 10 03:27:09 2908 BC
-   200 | Fri Apr 01 18:05:29 1805 BC
-   300 | Sat May 23 08:43:49 0702 BC
-   400 | Fri Jul 12 23:22:09 0402
-   500 | Fri Sep 01 14:00:29 1505
-   600 | Sat Oct 22 04:38:49 2608
-   700 | Fri Dec 11 19:17:09 3711
+ rowid |            timestamp_x             
+-------+------------------------------------
+   100 | Fri Feb 10 03:27:09.854119 2908 BC
+   200 | Fri Apr 01 18:05:29.977856 1805 BC
+   300 | Sat May 23 08:43:49.396147 0702 BC
+   400 | Fri Jul 12 23:22:09.140397 0402
+   500 | Fri Sep 01 14:00:29.968726 1505
+   600 | Sat Oct 22 04:38:49.619726 2608
+   700 | Fri Dec 11 19:17:09.683489 3711
    800 | 
    900 | 
   1000 | 
@@ -1098,8 +1098,8 @@ select rowid,timestamp_x from (select timestamp_x, row_number() over (order by t
 (18 rows)
 
 select rowid,timestamp_x from (select timestamp_x, row_number() over (order by timestamp_x asc NULLS FIRST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |         timestamp_x         
--------+-----------------------------
+ rowid |            timestamp_x             
+-------+------------------------------------
    100 | 
    200 | 
    300 | 
@@ -1111,25 +1111,25 @@ select rowid,timestamp_x from (select timestamp_x, row_number() over (order by t
    900 | 
   1000 | 
   1100 | 
-  1200 | Fri Feb 10 03:27:09 2908 BC
-  1300 | Fri Apr 01 18:05:29 1805 BC
-  1400 | Sat May 23 08:43:49 0702 BC
-  1500 | Fri Jul 12 23:22:09 0402
-  1600 | Fri Sep 01 14:00:29 1505
-  1700 | Sat Oct 22 04:38:49 2608
-  1800 | Fri Dec 11 19:17:09 3711
+  1200 | Fri Feb 10 03:27:09.854119 2908 BC
+  1300 | Fri Apr 01 18:05:29.977856 1805 BC
+  1400 | Sat May 23 08:43:49.396147 0702 BC
+  1500 | Fri Jul 12 23:22:09.140397 0402
+  1600 | Fri Sep 01 14:00:29.968726 1505
+  1700 | Sat Oct 22 04:38:49.619726 2608
+  1800 | Fri Dec 11 19:17:09.683489 3711
 (18 rows)
 
 select rowid,timestamp_x from (select timestamp_x, row_number() over (order by timestamp_x desc NULLS LAST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |         timestamp_x         
--------+-----------------------------
-   100 | Fri Aug 27 18:40:46 2906
-   200 | Fri Jul 08 04:02:26 1803
-   300 | Fri May 18 13:24:06 0700
-   400 | Fri Mar 28 22:45:46 0404 BC
-   500 | Fri Feb 05 08:07:26 1507 BC
-   600 | Thu Dec 16 17:29:06 2611 BC
-   700 | Wed Oct 26 02:50:46 3714 BC
+ rowid |            timestamp_x             
+-------+------------------------------------
+   100 | Fri Aug 27 18:40:46.697696 2906
+   200 | Fri Jul 08 04:02:26.129374 1803
+   300 | Fri May 18 13:24:06.280833 0700
+   400 | Fri Mar 28 22:45:46.886177 0404 BC
+   500 | Fri Feb 05 08:07:26.362964 1507 BC
+   600 | Thu Dec 16 17:29:06.961983 2611 BC
+   700 | Wed Oct 26 02:50:46.322547 3714 BC
    800 | 
    900 | 
   1000 | 
@@ -1144,35 +1144,35 @@ select rowid,timestamp_x from (select timestamp_x, row_number() over (order by t
 (18 rows)
 
 select * from ( select row_number() over () as rowid, timestamp_x from strom_time_test group by timestamp_x ) as t where t.rowid%50=0;
- rowid |         timestamp_x         
--------+-----------------------------
-    50 | Sun Jul 16 20:07:59 3460 BC
-   100 | Fri Feb 10 03:27:09 2908 BC
-   150 | Mon Sep 05 10:46:19 2357 BC
-   200 | Fri Apr 01 18:05:29 1805 BC
-   250 | Mon Oct 27 01:24:39 1254 BC
-   300 | Sat May 23 08:43:49 0702 BC
-   350 | Tue Dec 17 16:02:59 0151 BC
-   400 | Fri Jul 12 23:22:09 0402
-   450 | Wed Feb 06 06:41:19 0954
-   500 | Fri Sep 01 14:00:29 1505
-   550 | Wed Mar 28 21:19:39 2057
-   600 | Sat Oct 22 04:38:49 2608
-   650 | Wed May 18 11:57:59 3160
-   700 | Fri Dec 11 19:17:09 3711
+ rowid |            timestamp_x             
+-------+------------------------------------
+    50 | Sun Jul 16 20:07:59.299762 3460 BC
+   100 | Fri Feb 10 03:27:09.854119 2908 BC
+   150 | Mon Sep 05 10:46:19.698104 2357 BC
+   200 | Fri Apr 01 18:05:29.977856 1805 BC
+   250 | Mon Oct 27 01:24:39.644909 1254 BC
+   300 | Sat May 23 08:43:49.396147 0702 BC
+   350 | Tue Dec 17 16:02:59.220754 0151 BC
+   400 | Fri Jul 12 23:22:09.140397 0402
+   450 | Wed Feb 06 06:41:19.124906 0954
+   500 | Fri Sep 01 14:00:29.968726 1505
+   550 | Wed Mar 28 21:19:39.873632 2057
+   600 | Sat Oct 22 04:38:49.619726 2608
+   650 | Wed May 18 11:57:59.82895 3160
+   700 | Fri Dec 11 19:17:09.683489 3711
 (14 rows)
 
 select rowid,timestamptz_x from (select timestamptz_x, row_number() over (order by timestamptz_x asc ) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |          timestamptz_x          
--------+---------------------------------
-   100 | Fri Feb 10 13:57:26 2908 LMT BC
-   200 | Sat Apr 02 04:35:46 1805 LMT BC
-   300 | Sat May 23 19:14:06 0702 LMT BC
-   400 | Sat Jul 13 09:52:26 0402 LMT
-   500 | Sat Sep 02 00:30:46 1505 LMT
+ rowid |             timestamptz_x              
+-------+----------------------------------------
+   100 | Fri Feb 10 13:57:26.854119 2908 LMT BC
+   200 | Sat Apr 02 04:35:46.977856 1805 LMT BC
+   300 | Sat May 23 19:14:06.396147 0702 LMT BC
+   400 | Sat Jul 13 09:52:26.140397 0402 LMT
+   500 | Sat Sep 02 00:30:46.968726 1505 LMT
    600 | Sun Mar 08 09:59:59 2015 MSK
-   700 | Sat Oct 22 14:38:49 2608 MSK
-   800 | Sat Dec 12 06:17:09 3711 MSK
+   700 | Sat Oct 22 14:38:49.619726 2608 MSK
+   800 | Sat Dec 12 06:17:09.683489 3711 MSK
    900 | 
   1000 | 
   1100 | 
@@ -1186,8 +1186,8 @@ select rowid,timestamptz_x from (select timestamptz_x, row_number() over (order 
 (18 rows)
 
 select rowid,timestamptz_x from (select timestamptz_x, row_number() over (order by timestamptz_x asc NULLS FIRST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |          timestamptz_x          
--------+---------------------------------
+ rowid |             timestamptz_x              
+-------+----------------------------------------
    100 | 
    200 | 
    300 | 
@@ -1198,27 +1198,27 @@ select rowid,timestamptz_x from (select timestamptz_x, row_number() over (order 
    800 | 
    900 | 
   1000 | 
-  1100 | Fri Feb 10 13:57:26 2908 LMT BC
-  1200 | Sat Apr 02 04:35:46 1805 LMT BC
-  1300 | Sat May 23 19:14:06 0702 LMT BC
-  1400 | Sat Jul 13 09:52:26 0402 LMT
-  1500 | Sat Sep 02 00:30:46 1505 LMT
+  1100 | Fri Feb 10 13:57:26.854119 2908 LMT BC
+  1200 | Sat Apr 02 04:35:46.977856 1805 LMT BC
+  1300 | Sat May 23 19:14:06.396147 0702 LMT BC
+  1400 | Sat Jul 13 09:52:26.140397 0402 LMT
+  1500 | Sat Sep 02 00:30:46.968726 1505 LMT
   1600 | Sun Mar 08 09:59:59 2015 MSK
-  1700 | Sat Oct 22 14:38:49 2608 MSK
-  1800 | Sat Dec 12 06:17:09 3711 MSK
+  1700 | Sat Oct 22 14:38:49.619726 2608 MSK
+  1800 | Sat Dec 12 06:17:09.683489 3711 MSK
 (18 rows)
 
 select rowid,timestamptz_x from (select timestamptz_x, row_number() over (order by timestamptz_x desc NULLS LAST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |          timestamptz_x          
--------+---------------------------------
-   100 | Sat Aug 28 04:40:46 2906 MSK
+ rowid |             timestamptz_x              
+-------+----------------------------------------
+   100 | Sat Aug 28 04:40:46.697696 2906 MSK
    200 | Sun Mar 08 09:59:59 2015 MSK
-   300 | Fri Jul 08 14:32:43 1803 LMT
-   400 | Fri May 18 23:54:23 0700 LMT
-   500 | Sat Mar 29 09:16:03 0404 LMT BC
-   600 | Fri Feb 05 18:37:43 1507 LMT BC
-   700 | Fri Dec 17 03:59:23 2611 LMT BC
-   800 | Wed Oct 26 13:21:03 3714 LMT BC
+   300 | Fri Jul 08 14:32:43.129374 1803 LMT
+   400 | Fri May 18 23:54:23.280833 0700 LMT
+   500 | Sat Mar 29 09:16:03.886177 0404 LMT BC
+   600 | Fri Feb 05 18:37:43.362964 1507 LMT BC
+   700 | Fri Dec 17 03:59:23.961983 2611 LMT BC
+   800 | Wed Oct 26 13:21:03.322547 3714 LMT BC
    900 | 
   1000 | 
   1100 | 
@@ -1232,22 +1232,22 @@ select rowid,timestamptz_x from (select timestamptz_x, row_number() over (order 
 (18 rows)
 
 select * from ( select row_number() over () as rowid, timestamptz_x from strom_time_test group by timestamptz_x ) as t where t.rowid%50=0;
- rowid |          timestamptz_x          
--------+---------------------------------
-    50 | Mon Jul 17 06:38:16 3460 LMT BC
-   100 | Fri Feb 10 13:57:26 2908 LMT BC
-   150 | Mon Sep 05 21:16:36 2357 LMT BC
-   200 | Sat Apr 02 04:35:46 1805 LMT BC
-   250 | Mon Oct 27 11:54:56 1254 LMT BC
-   300 | Sat May 23 19:14:06 0702 LMT BC
-   350 | Wed Dec 18 02:33:16 0151 LMT BC
-   400 | Sat Jul 13 09:52:26 0402 LMT
-   450 | Wed Feb 06 17:11:36 0954 LMT
-   500 | Sat Sep 02 00:30:46 1505 LMT
-   550 | Sat Mar 17 20:08:28 2046 MSK
-   600 | Wed Oct 11 03:27:38 2597 MSK
-   650 | Sat May 07 10:46:48 3149 MSK
-   700 | Tue Nov 30 19:05:58 3700 MSK
+ rowid |             timestamptz_x              
+-------+----------------------------------------
+    50 | Mon Jul 17 06:38:16.299762 3460 LMT BC
+   100 | Fri Feb 10 13:57:26.854119 2908 LMT BC
+   150 | Mon Sep 05 21:16:36.698104 2357 LMT BC
+   200 | Sat Apr 02 04:35:46.977856 1805 LMT BC
+   250 | Mon Oct 27 11:54:56.644909 1254 LMT BC
+   300 | Sat May 23 19:14:06.396147 0702 LMT BC
+   350 | Wed Dec 18 02:33:16.220754 0151 LMT BC
+   400 | Sat Jul 13 09:52:26.140397 0402 LMT
+   450 | Wed Feb 06 17:11:36.124906 0954 LMT
+   500 | Sat Sep 02 00:30:46.968726 1505 LMT
+   550 | Sat Mar 17 20:08:28.253527 2046 MSK
+   600 | Wed Oct 11 03:27:38.073792 2597 MSK
+   650 | Sat May 07 10:46:48.373047 3149 MSK
+   700 | Tue Nov 30 19:05:58.647865 3700 MSK
 (14 rows)
 
 select rowid,date_x from (select date_x, row_number() over (order by date_x asc ) as rowid from strom_time_test) as t where t.rowid%100=0;
@@ -1339,16 +1339,16 @@ select * from ( select row_number() over () as rowid, date_x from strom_time_tes
 (14 rows)
 
 select rowid,time_x from (select time_x, row_number() over (order by time_x asc ) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |  time_x  
--------+----------
-   100 | 03:25:19
-   200 | 06:41:19
-   300 | 09:57:19
-   400 | 13:12:57
-   500 | 16:39:00
-   600 | 19:55:00
+ rowid |     time_x      
+-------+-----------------
+   100 | 03:25:19.238982
+   200 | 06:41:19.124906
+   300 | 09:57:19.732426
+   400 | 13:12:57.57418
+   500 | 16:39:00.785794
+   600 | 19:55:00.340236
    700 | 22:59:59
-   800 | 23:10:38
+   800 | 23:10:38.569397
    900 | 
   1000 | 
   1100 | 
@@ -1362,8 +1362,8 @@ select rowid,time_x from (select time_x, row_number() over (order by time_x asc 
 (18 rows)
 
 select rowid,time_x from (select time_x, row_number() over (order by time_x asc NULLS FIRST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |  time_x  
--------+----------
+ rowid |     time_x      
+-------+-----------------
    100 | 
    200 | 
    300 | 
@@ -1374,27 +1374,27 @@ select rowid,time_x from (select time_x, row_number() over (order by time_x asc 
    800 | 
    900 | 
   1000 | 
-  1100 | 03:25:19
-  1200 | 06:41:19
-  1300 | 09:57:19
-  1400 | 13:12:57
-  1500 | 16:39:00
-  1600 | 19:55:00
+  1100 | 03:25:19.238982
+  1200 | 06:41:19.124906
+  1300 | 09:57:19.732426
+  1400 | 13:12:57.57418
+  1500 | 16:39:00.785794
+  1600 | 19:55:00.340236
   1700 | 22:59:59
-  1800 | 23:10:38
+  1800 | 23:10:38.569397
 (18 rows)
 
 select rowid,time_x from (select time_x, row_number() over (order by time_x desc NULLS LAST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |  time_x  
--------+----------
+ rowid |     time_x      
+-------+-----------------
    100 | 22:59:59
-   200 | 20:44:44
-   300 | 17:28:44
-   400 | 14:12:44
-   500 | 10:57:06
-   600 | 07:31:25
-   700 | 04:15:25
-   800 | 00:59:25
+   200 | 20:44:44.218017
+   300 | 17:28:44.463378
+   400 | 14:12:44.85711
+   500 | 10:57:06.979514
+   600 | 07:31:25.861473
+   700 | 04:15:25.301755
+   800 | 00:59:25.00497
    900 | 
   1000 | 
   1100 | 
@@ -1408,34 +1408,34 @@ select rowid,time_x from (select time_x, row_number() over (order by time_x desc
 (18 rows)
 
 select * from ( select row_number() over () as rowid, time_x from strom_time_test group by time_x ) as t where t.rowid%50=0;
- rowid |  time_x  
--------+----------
-    50 | 01:37:16
-   100 | 03:25:19
-   150 | 05:03:19
-   200 | 06:41:19
-   250 | 08:19:19
-   300 | 09:57:19
-   350 | 11:34:57
-   400 | 13:12:57
-   450 | 15:01:00
-   500 | 16:39:00
-   550 | 18:17:00
-   600 | 19:55:00
-   650 | 21:33:00
-   700 | 23:10:16
+ rowid |     time_x      
+-------+-----------------
+    50 | 01:37:16.71724
+   100 | 03:25:19.238982
+   150 | 05:03:19.100236
+   200 | 06:41:19.124906
+   250 | 08:19:19.039758
+   300 | 09:57:19.732426
+   350 | 11:34:57.568737
+   400 | 13:12:57.57418
+   450 | 15:01:00.683831
+   500 | 16:39:00.785794
+   550 | 18:17:00.592425
+   600 | 19:55:00.340236
+   650 | 21:33:00.123318
+   700 | 23:10:16.823918
 (14 rows)
 
 select rowid,timetz_x from (select timetz_x, row_number() over (order by timetz_x asc ) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |  timetz_x   
--------+-------------
-   100 | 03:13:48-08
-   200 | 07:29:35-07
-   300 | 09:45:26-08
-   400 | 13:11:51-08
-   500 | 16:27:29-08
-   600 | 19:43:29-08
-   700 | 22:58:45-08
+ rowid |      timetz_x      
+-------+--------------------
+   100 | 03:13:48.318379-08
+   200 | 07:29:35.574413-07
+   300 | 09:45:26.317605-08
+   400 | 13:11:51.939133-08
+   500 | 16:27:29.712007-08
+   600 | 19:43:29.76542-08
+   700 | 22:58:45.170876-08
    800 | 
    900 | 
   1000 | 
@@ -1450,8 +1450,8 @@ select rowid,timetz_x from (select timetz_x, row_number() over (order by timetz_
 (18 rows)
 
 select rowid,timetz_x from (select timetz_x, row_number() over (order by timetz_x asc NULLS FIRST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |  timetz_x   
--------+-------------
+ rowid |      timetz_x      
+-------+--------------------
    100 | 
    200 | 
    300 | 
@@ -1463,25 +1463,25 @@ select rowid,timetz_x from (select timetz_x, row_number() over (order by timetz_
    900 | 
   1000 | 
   1100 | 
-  1200 | 03:13:48-08
-  1300 | 07:29:35-07
-  1400 | 09:45:26-08
-  1500 | 13:11:51-08
-  1600 | 16:27:29-08
-  1700 | 19:43:29-08
-  1800 | 22:58:45-08
+  1200 | 03:13:48.318379-08
+  1300 | 07:29:35.574413-07
+  1400 | 09:45:26.317605-08
+  1500 | 13:11:51.939133-08
+  1600 | 16:27:29.712007-08
+  1700 | 19:43:29.76542-08
+  1800 | 22:58:45.170876-08
 (18 rows)
 
 select rowid,timetz_x from (select timetz_x, row_number() over (order by timetz_x desc NULLS LAST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |  timetz_x   
--------+-------------
-   100 | 20:43:16-08
-   200 | 17:16:29-08
-   300 | 14:01:13-08
-   400 | 10:45:13-08
-   500 | 07:19:10-08
-   600 | 04:03:10-08
-   700 | 00:47:54-08
+ rowid |      timetz_x      
+-------+--------------------
+   100 | 20:43:16.907735-08
+   200 | 17:16:29.037753-08
+   300 | 14:01:13.662515-08
+   400 | 10:45:13.962092-08
+   500 | 07:19:10.477353-08
+   600 | 04:03:10.184948-08
+   700 | 00:47:54.25861-08
    800 | 
    900 | 
   1000 | 
@@ -1496,34 +1496,34 @@ select rowid,timetz_x from (select timetz_x, row_number() over (order by timetz_
 (18 rows)
 
 select * from ( select row_number() over () as rowid, timetz_x from strom_time_test group by timetz_x ) as t where t.rowid%50=0;
- rowid |  timetz_x   
--------+-------------
-    50 | 01:25:23-08
-   100 | 03:13:48-08
-   150 | 05:51:57-07
-   200 | 07:29:35-07
-   250 | 08:07:26-08
-   300 | 09:45:26-08
-   350 | 11:34:13-08
-   400 | 13:11:51-08
-   450 | 14:49:29-08
-   500 | 16:27:29-08
-   550 | 18:05:29-08
-   600 | 19:43:29-08
-   650 | 21:21:07-08
-   700 | 22:58:45-08
+ rowid |      timetz_x      
+-------+--------------------
+    50 | 01:25:23.719053-08
+   100 | 03:13:48.318379-08
+   150 | 05:51:57.480354-07
+   200 | 07:29:35.574413-07
+   250 | 08:07:26.362964-08
+   300 | 09:45:26.317605-08
+   350 | 11:34:13.797992-08
+   400 | 13:11:51.939133-08
+   450 | 14:49:29.667852-08
+   500 | 16:27:29.712007-08
+   550 | 18:05:29.977856-08
+   600 | 19:43:29.76542-08
+   650 | 21:21:07.489952-08
+   700 | 22:58:45.170876-08
 (14 rows)
 
 select rowid,interval_x from (select interval_x, row_number() over (order by interval_x asc ) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |                 interval_x                  
--------+---------------------------------------------
-   100 | @ 1781246 days 12 hours 32 mins 51 secs ago
-   200 | @ 1378332 days 21 hours 54 mins 31 secs ago
-   300 | @ 975419 days 7 hours 16 mins 11 secs ago
-   400 | @ 572506 days 16 hours 37 mins 51 secs ago
-   500 | @ 169594 days 1 hour 59 mins 31 secs ago
-   600 | @ 233319 days 11 hours 38 mins 49 secs
-   700 | @ 636232 days 3 hours 17 mins 9 secs
+ rowid |                     interval_x                     
+-------+----------------------------------------------------
+   100 | @ 1781246 days 12 hours 32 mins 50.145881 secs ago
+   200 | @ 1378332 days 21 hours 54 mins 30.022144 secs ago
+   300 | @ 975419 days 7 hours 16 mins 10.603853 secs ago
+   400 | @ 572506 days 16 hours 37 mins 50.859603 secs ago
+   500 | @ 169594 days 1 hour 59 mins 30.031274 secs ago
+   600 | @ 233319 days 11 hours 38 mins 49.619726 secs
+   700 | @ 636232 days 3 hours 17 mins 9.683489 secs
    800 | 
    900 | 
   1000 | 
@@ -1538,8 +1538,8 @@ select rowid,interval_x from (select interval_x, row_number() over (order by int
 (18 rows)
 
 select rowid,interval_x from (select interval_x, row_number() over (order by interval_x asc NULLS FIRST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |                 interval_x                  
--------+---------------------------------------------
+ rowid |                     interval_x                     
+-------+----------------------------------------------------
    100 | 
    200 | 
    300 | 
@@ -1551,25 +1551,25 @@ select rowid,interval_x from (select interval_x, row_number() over (order by int
    900 | 
   1000 | 
   1100 | 
-  1200 | @ 1781246 days 12 hours 32 mins 51 secs ago
-  1300 | @ 1378332 days 21 hours 54 mins 31 secs ago
-  1400 | @ 975419 days 7 hours 16 mins 11 secs ago
-  1500 | @ 572506 days 16 hours 37 mins 51 secs ago
-  1600 | @ 169594 days 1 hour 59 mins 31 secs ago
-  1700 | @ 233319 days 11 hours 38 mins 49 secs
-  1800 | @ 636232 days 3 hours 17 mins 9 secs
+  1200 | @ 1781246 days 12 hours 32 mins 50.145881 secs ago
+  1300 | @ 1378332 days 21 hours 54 mins 30.022144 secs ago
+  1400 | @ 975419 days 7 hours 16 mins 10.603853 secs ago
+  1500 | @ 572506 days 16 hours 37 mins 50.859603 secs ago
+  1600 | @ 169594 days 1 hour 59 mins 30.031274 secs ago
+  1700 | @ 233319 days 11 hours 38 mins 49.619726 secs
+  1800 | @ 636232 days 3 hours 17 mins 9.683489 secs
 (18 rows)
 
 select rowid,interval_x from (select interval_x, row_number() over (order by interval_x desc NULLS LAST) as rowid from strom_time_test) as t where t.rowid%100=0;
- rowid |                 interval_x                  
--------+---------------------------------------------
-   100 | @ 342106 days 1 hour 40 mins 46 secs
-   200 | @ 60807 days 11 hours 57 mins 34 secs ago
-   300 | @ 463720 days 2 hours 35 mins 54 secs ago
-   400 | @ 866632 days 17 hours 14 mins 14 secs ago
-   500 | @ 1269546 days 7 hours 52 mins 34 secs ago
-   600 | @ 1672459 days 22 hours 30 mins 54 secs ago
-   700 | @ 2075374 days 13 hours 9 mins 14 secs ago
+ rowid |                     interval_x                     
+-------+----------------------------------------------------
+   100 | @ 342106 days 1 hour 40 mins 46.697696 secs
+   200 | @ 60807 days 11 hours 57 mins 33.870626 secs ago
+   300 | @ 463720 days 2 hours 35 mins 53.719167 secs ago
+   400 | @ 866632 days 17 hours 14 mins 13.113823 secs ago
+   500 | @ 1269546 days 7 hours 52 mins 33.637036 secs ago
+   600 | @ 1672459 days 22 hours 30 mins 53.038017 secs ago
+   700 | @ 2075374 days 13 hours 9 mins 13.677453 secs ago
    800 | 
    900 | 
   1000 | 
@@ -1584,21 +1584,21 @@ select rowid,interval_x from (select interval_x, row_number() over (order by int
 (18 rows)
 
 select * from ( select row_number() over () as rowid, interval_x from strom_time_test group by interval_x ) as t where t.rowid%50=0;
- rowid |                 interval_x                  
--------+---------------------------------------------
-    50 | @ 1982703 days 19 hours 52 mins 1 sec ago
-   100 | @ 1781246 days 12 hours 32 mins 51 secs ago
-   150 | @ 1579790 days 5 hours 13 mins 41 secs ago
-   200 | @ 1378332 days 21 hours 54 mins 31 secs ago
-   250 | @ 1176877 days 14 hours 35 mins 21 secs ago
-   300 | @ 975419 days 7 hours 16 mins 11 secs ago
-   350 | @ 773962 days 23 hours 57 mins 1 sec ago
-   400 | @ 572506 days 16 hours 37 mins 51 secs ago
-   450 | @ 371049 days 9 hours 18 mins 41 secs ago
-   500 | @ 169594 days 1 hour 59 mins 31 secs ago
-   550 | @ 31864 days 4 hours 19 mins 39 secs
-   600 | @ 233319 days 11 hours 38 mins 49 secs
-   650 | @ 434776 days 18 hours 57 mins 59 secs
-   700 | @ 636232 days 3 hours 17 mins 9 secs
+ rowid |                     interval_x                     
+-------+----------------------------------------------------
+    50 | @ 1982703 days 19 hours 52 mins 0.700238 secs ago
+   100 | @ 1781246 days 12 hours 32 mins 50.145881 secs ago
+   150 | @ 1579790 days 5 hours 13 mins 40.301896 secs ago
+   200 | @ 1378332 days 21 hours 54 mins 30.022144 secs ago
+   250 | @ 1176877 days 14 hours 35 mins 20.355091 secs ago
+   300 | @ 975419 days 7 hours 16 mins 10.603853 secs ago
+   350 | @ 773962 days 23 hours 57 mins 0.779246 secs ago
+   400 | @ 572506 days 16 hours 37 mins 50.859603 secs ago
+   450 | @ 371049 days 9 hours 18 mins 40.875094 secs ago
+   500 | @ 169594 days 1 hour 59 mins 30.031274 secs ago
+   550 | @ 31864 days 4 hours 19 mins 39.873632 secs
+   600 | @ 233319 days 11 hours 38 mins 49.619726 secs
+   650 | @ 434776 days 18 hours 57 mins 59.82895 secs
+   700 | @ 636232 days 3 hours 17 mins 9.683489 secs
 (14 rows)
 
