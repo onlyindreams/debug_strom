@@ -9,6 +9,7 @@ set pg_strom.enable_gpuhashjoin to off;
 set pg_strom.enable_gpupreagg to off;
 set pg_strom.enable_gpusort to off;
 set client_min_messages to warning;
+--# #####  pg_strom = off #####
 set pg_strom.enabled=off;
 -- normal
 explain (verbose, costs off, timing off) select  smlint_x    from strom_test order by id limit 100;
@@ -473,6 +474,7 @@ explain (verbose, costs off, timing off) select  id,bigsrl_x    from strom_test 
                Filter: (abs(strom_test.bigsrl_x) IS NOT NULL)
 (8 rows)
 
+--# #####  pg_strom = on #####
 set pg_strom.enabled=on;
 set pg_strom.enable_gpusort to off;
 -- normal
@@ -966,6 +968,7 @@ explain (verbose, costs off, timing off) select  id,bigsrl_x    from strom_test 
 (9 rows)
 
 -- division by zero with GpuScan
+--# #####  pg_strom = on #####
 set pg_strom.enabled=on;
 explain (verbose on, costs off) select * from strom_test where smlint_x/(id%1000) = 1;
                                                QUERY PLAN                                                
@@ -1012,6 +1015,7 @@ explain (verbose on, costs off) select * from strom_test where float_x/(id%1000)
    Features: format: tuple-slot, bulkload: supported
 (4 rows)
 
+--# #####  pg_strom = off #####
 set pg_strom.enabled=off;
 explain (verbose on, costs off) select * from strom_test where smlint_x/(id%1000) = 1;
                                                QUERY PLAN                                                
@@ -1052,4 +1056,1644 @@ explain (verbose on, costs off) select * from strom_test where float_x/(id%1000)
    Output: id, key, smlint_x, integer_x, bigint_x, real_x, float_x, nume_x, smlsrl_x, serial_x, bigsrl_x
    Filter: ((strom_test.float_x / ((strom_test.id % 1000))::double precision) = '1'::double precision)
 (3 rows)
+
+--#
+--#  *********************** DATE/TIME types test cases on PG-Strom ***********************
+--#  NOTICE : filter of timetz and interval data types is not yet impletemnted on pg_strom.
+--#           if their function added, then we need to rework this test cases.
+--#  **************************************************************************************
+--#
+--# #####  pg_strom = on #####
+set pg_strom.enabled=on;
+--# Following date/time function cannot yet use on GPU device filter.
+--# age,date_part,date_trunc,extract,isfinite,justify_days,make_date,make_interval,make_time,make_timestamp,make_timestamptz
+--# But now() function can use on GPU device.
+explain (verbose, costs off, timing off) select * from strom_time_test where timestamp_x < timestamp 'epoch' and timestamp_x < now() order by timestamp_x asc limit 100;
+                                                                            QUERY PLAN                                                                            
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Sort
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Sort Key: strom_time_test.timestamp_x
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+               Device Filter: ((strom_time_test.timestamp_x < 'Thu Jan 01 00:00:00 1970'::timestamp without time zone) AND (strom_time_test.timestamp_x < now()))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select * from strom_time_test where timestamp_x < timestamp 'epoch' and timestamptz_x < now() order by timestamptz_x asc limit 100;
+                                                                             QUERY PLAN                                                                             
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Sort
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Sort Key: strom_time_test.timestamptz_x
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+               Device Filter: ((strom_time_test.timestamp_x < 'Thu Jan 01 00:00:00 1970'::timestamp without time zone) AND (strom_time_test.timestamptz_x < now()))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+--# Operator test; (+,-,*,/) and overlaps. 
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + 1 = timestamp_x::date + 1 order by id limit 100;
+                                                      QUERY PLAN                                                      
+----------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: (((strom_time_test.timestamp_x)::date + 1) = ((strom_time_test.timestamp_x)::date + 1))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + '1 year'::interval = timestamp_x::date + '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + time '01:00' = timestamp_x::date + time '01:00' order by id limit 100;
+                                                                                       QUERY PLAN                                                                                       
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: (((strom_time_test.timestamp_x)::date + '01:00:00'::time without time zone) = ((strom_time_test.timestamp_x)::date + '01:00:00'::time without time zone))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x + interval_x = interval_x + interval_x order by id limit 100;
+                                                                      QUERY PLAN                                                                      
+------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((strom_time_test.interval_x + strom_time_test.interval_x) = (strom_time_test.interval_x + strom_time_test.interval_x))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x + interval '1 year' = timestamp_x + interval '1 year'::interval order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x + '1 year'::interval = time_x + '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where - interval_x = - interval_x order by id limit 100;
+                                           QUERY PLAN                                           
+------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((- strom_time_test.interval_x) = (- strom_time_test.interval_x))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x - timestamp_x = timestamp_x - timestamp_x  order by id limit 100;
+                                                                        QUERY PLAN                                                                        
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((strom_time_test.timestamp_x - strom_time_test.timestamp_x) = (strom_time_test.timestamp_x - strom_time_test.timestamp_x))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date - 1 = timestamp_x::date - 1  order by id limit 100;
+                                                      QUERY PLAN                                                      
+----------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: (((strom_time_test.timestamp_x)::date - 1) = ((strom_time_test.timestamp_x)::date - 1))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date - '1 year'::interval = timestamp_x::date - '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x - time_x = time_x - time_x  order by id limit 100;
+                                                              QUERY PLAN                                                              
+--------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((strom_time_test.time_x - strom_time_test.time_x) = (strom_time_test.time_x - strom_time_test.time_x))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x + interval '1 hour' = time_x + interval '1 hour'::interval order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x - '23 hours'::interval = timestamp_x - '23 hours'::interval  order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x - '23 hours'::interval = interval_x - '23 hours'::interval  order by id limit 100;
+                                                                  QUERY PLAN                                                                  
+----------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((strom_time_test.interval_x - '@ 23 hours'::interval) = (strom_time_test.interval_x - '@ 23 hours'::interval))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x * 12.35  = interval_x * 12.35  order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x / 12.35  = interval_x / 12.35  order by id limit 100;
+--# overlaps
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where (timestamp_x,now()) overlaps (timestamp_x,now()) order by id limit 100;
+                                                                               QUERY PLAN                                                                                
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: "overlaps"((strom_time_test.timestamp_x)::timestamp with time zone, now(), (strom_time_test.timestamp_x)::timestamp with time zone, now())
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where (timestamp_x,now()) overlaps (timestamp with time zone 'epoch'::timestamp,now()) order by id limit 100;
+                                                                                                             QUERY PLAN                                                                                                              
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: "overlaps"((strom_time_test.timestamp_x)::timestamp with time zone, now(), (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::timestamp without time zone)::timestamp with time zone, now())
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+--# Operator test; (<, <=, >, >=)
+--# < 
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + 1 < timestamp with time zone 'epoch'::date + 1 order by id limit 100;
+                                                                    QUERY PLAN                                                                     
+---------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: (((strom_time_test.timestamp_x)::date + 1) < (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date + 1))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + '1 year'::interval < timestamp with time zone 'epoch'::date + '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + time '01:00' < timestamp with time zone 'epoch'::date + time '01:00' order by id limit 100;
+                                                                                                     QUERY PLAN                                                                                                      
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: (((strom_time_test.timestamp_x)::date + '01:00:00'::time without time zone) < (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date + '01:00:00'::time without time zone))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x + interval_x < interval_x + interval_x + interval '1 seconds' order by id limit 100;
+                                                                                  QUERY PLAN                                                                                  
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((strom_time_test.interval_x + strom_time_test.interval_x) < ((strom_time_test.interval_x + strom_time_test.interval_x) + '@ 1 sec'::interval))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x + interval '1 year' < timestamp with time zone 'epoch' + interval '1 year'::interval order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x + '1 year'::interval < timestamp with time zone 'epoch'::time + '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where - interval_x < - interval_x + interval '1 seconds' order by id limit 100;
+                                                       QUERY PLAN                                                       
+------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((- strom_time_test.interval_x) < ((- strom_time_test.interval_x) + '@ 1 sec'::interval))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x - timestamp_x < timestamp_x - timestamp 'epoch'  order by id limit 100;
+                                                                                      QUERY PLAN                                                                                      
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((strom_time_test.timestamp_x - strom_time_test.timestamp_x) < (strom_time_test.timestamp_x - 'Thu Jan 01 00:00:00 1970'::timestamp without time zone))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date - 1 < timestamp with time zone 'epoch'::date - 1  order by id limit 100;
+                                                                    QUERY PLAN                                                                     
+---------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: (((strom_time_test.timestamp_x)::date - 1) < (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date - 1))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date - '1 year'::interval < timestamp with time zone 'epoch'::date - '1 year'::interval order by id limit 100; 
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x - time_x < time_x - timestamp with time zone 'epoch'::time  order by id limit 100;
+                                                                                            QUERY PLAN                                                                                            
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((strom_time_test.time_x - strom_time_test.time_x) < (strom_time_test.time_x - ('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::time without time zone))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x + interval '1 hour' < timestamp with time zone 'epoch'::time + interval '1 hour'::interval order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x - '23 hours'::interval < timestamp with time zone 'epoch'::timestamp - '23 hours'::interval  order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x - '23 hours'::interval < interval_x - '23 hours'::interval + interval '1 seconds'  order by id limit 100;
+                                                                              QUERY PLAN                                                                              
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((strom_time_test.interval_x - '@ 23 hours'::interval) < ((strom_time_test.interval_x - '@ 23 hours'::interval) + '@ 1 sec'::interval))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x * 12.35  < interval_x * 12.35 + interval '1 seconds' order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x / 12.35  < interval_x / 12.35 + interval '1 seconds' order by id limit 100;
+--# <= 
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + 1 <= timestamp with time zone 'epoch'::date + 1 order by id limit 100;
+                                                                     QUERY PLAN                                                                     
+----------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: (((strom_time_test.timestamp_x)::date + 1) <= (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date + 1))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + '1 year'::interval <= timestamp with time zone 'epoch'::date + '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + time '01:00' <= timestamp with time zone 'epoch'::date + time '01:00' order by id limit 100;
+                                                                                                      QUERY PLAN                                                                                                      
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: (((strom_time_test.timestamp_x)::date + '01:00:00'::time without time zone) <= (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date + '01:00:00'::time without time zone))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x + interval_x <= interval_x + interval_x + interval '1 seconds' order by id limit 100;
+                                                                                  QUERY PLAN                                                                                   
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((strom_time_test.interval_x + strom_time_test.interval_x) <= ((strom_time_test.interval_x + strom_time_test.interval_x) + '@ 1 sec'::interval))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x + interval '1 year' <= timestamp with time zone 'epoch' + interval '1 year'::interval order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x + '1 year'::interval <= timestamp with time zone 'epoch'::time + '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where - interval_x <= - interval_x + interval '1 seconds' order by id limit 100;
+                                                       QUERY PLAN                                                        
+-------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((- strom_time_test.interval_x) <= ((- strom_time_test.interval_x) + '@ 1 sec'::interval))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x - timestamp_x <= timestamp_x - timestamp 'epoch'  order by id limit 100;
+                                                                                      QUERY PLAN                                                                                       
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((strom_time_test.timestamp_x - strom_time_test.timestamp_x) <= (strom_time_test.timestamp_x - 'Thu Jan 01 00:00:00 1970'::timestamp without time zone))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date - 1 <= timestamp with time zone 'epoch'::date - 1  order by id limit 100;
+                                                                     QUERY PLAN                                                                     
+----------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: (((strom_time_test.timestamp_x)::date - 1) <= (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date - 1))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date - '1 year'::interval <= timestamp with time zone 'epoch'::date - '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x - time_x <= time_x - timestamp with time zone 'epoch'::time  order by id limit 100;
+                                                                                            QUERY PLAN                                                                                             
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((strom_time_test.time_x - strom_time_test.time_x) <= (strom_time_test.time_x - ('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::time without time zone))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x + interval '1 hour' <= timestamp with time zone 'epoch'::time + interval '1 hour'::interval order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x - '23 hours'::interval <= timestamp with time zone 'epoch'::timestamp - '23 hours'::interval  order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x - '23 hours'::interval <= interval_x - '23 hours'::interval + interval '1 seconds'  order by id limit 100;
+                                                                              QUERY PLAN                                                                               
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((strom_time_test.interval_x - '@ 23 hours'::interval) <= ((strom_time_test.interval_x - '@ 23 hours'::interval) + '@ 1 sec'::interval))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x * 12.35  <= interval_x * 12.35 + interval '1 seconds' order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x / 12.35  <= interval_x / 12.35 + interval '1 seconds' order by id limit 100;
+--# >  
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + 1 >  timestamp with time zone 'epoch'::date + 1 order by id limit 100;
+                                                                    QUERY PLAN                                                                     
+---------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: (((strom_time_test.timestamp_x)::date + 1) > (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date + 1))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + '1 year'::interval >  timestamp with time zone 'epoch'::date + '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + time '01:00' >  timestamp with time zone 'epoch'::date + time '01:00' order by id limit 100;
+                                                                                                     QUERY PLAN                                                                                                      
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: (((strom_time_test.timestamp_x)::date + '01:00:00'::time without time zone) > (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date + '01:00:00'::time without time zone))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x + interval_x >  interval_x + interval_x - interval '1 seconds' order by id limit 100;
+                                                                                  QUERY PLAN                                                                                  
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((strom_time_test.interval_x + strom_time_test.interval_x) > ((strom_time_test.interval_x + strom_time_test.interval_x) - '@ 1 sec'::interval))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x + interval '1 year' >  timestamp with time zone 'epoch' + interval '1 year'::interval order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x + '1 year'::interval >  timestamp with time zone 'epoch'::time + '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where - interval_x >  - interval_x - interval '1 seconds' order by id limit 100;
+                                                       QUERY PLAN                                                       
+------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((- strom_time_test.interval_x) > ((- strom_time_test.interval_x) - '@ 1 sec'::interval))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x - timestamp_x >  timestamp_x - timestamp 'epoch'  order by id limit 100;
+                                                                                      QUERY PLAN                                                                                      
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((strom_time_test.timestamp_x - strom_time_test.timestamp_x) > (strom_time_test.timestamp_x - 'Thu Jan 01 00:00:00 1970'::timestamp without time zone))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date - 1 >  timestamp with time zone 'epoch'::date - 1  order by id limit 100;
+                                                                    QUERY PLAN                                                                     
+---------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: (((strom_time_test.timestamp_x)::date - 1) > (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date - 1))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date - '1 year'::interval >  timestamp with time zone 'epoch'::date - '1 year'::interval order by id limit 100;
+                                                                                    QUERY PLAN                                                                                    
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: (((strom_time_test.timestamp_x)::date - '@ 1 year'::interval) > (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date - '@ 1 year'::interval))
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x - time_x >  time_x - timestamp with time zone 'epoch'::time  order by id limit 100;
+                                                                                            QUERY PLAN                                                                                            
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((strom_time_test.time_x - strom_time_test.time_x) > (strom_time_test.time_x - ('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::time without time zone))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x + interval '1 hour' >  timestamp with time zone 'epoch'::time + interval '1 hour'::interval order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x - '23 hours'::interval >  timestamp with time zone 'epoch'::timestamp - '23 hours'::interval  order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x - '23 hours'::interval >  interval_x - '23 hours'::interval - interval '1 seconds'  order by id limit 100;
+                                                                              QUERY PLAN                                                                              
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((strom_time_test.interval_x - '@ 23 hours'::interval) > ((strom_time_test.interval_x - '@ 23 hours'::interval) - '@ 1 sec'::interval))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x * 12.35  >  interval_x * 12.35 - interval '1 seconds' order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x / 12.35  >  interval_x / 12.35 - interval '1 seconds' order by id limit 100;
+--# >=  
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + 1 >=  timestamp with time zone 'epoch'::date + 1 order by id limit 100;
+                                                                     QUERY PLAN                                                                     
+----------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: (((strom_time_test.timestamp_x)::date + 1) >= (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date + 1))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + '1 year'::interval >=  timestamp with time zone 'epoch'::date + '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + time '01:00' >=  timestamp with time zone 'epoch'::date + time '01:00' order by id limit 100;
+                                                                                                      QUERY PLAN                                                                                                      
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: (((strom_time_test.timestamp_x)::date + '01:00:00'::time without time zone) >= (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date + '01:00:00'::time without time zone))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x + interval_x >=  interval_x + interval_x - interval '1 seconds' order by id limit 100;
+                                                                                  QUERY PLAN                                                                                   
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((strom_time_test.interval_x + strom_time_test.interval_x) >= ((strom_time_test.interval_x + strom_time_test.interval_x) - '@ 1 sec'::interval))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x + interval '1 year' >=  timestamp with time zone 'epoch' + interval '1 year'::interval order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x + '1 year'::interval >=  timestamp with time zone 'epoch'::time + '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where - interval_x >=  - interval_x - interval '1 seconds' order by id limit 100;
+                                                       QUERY PLAN                                                        
+-------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((- strom_time_test.interval_x) >= ((- strom_time_test.interval_x) - '@ 1 sec'::interval))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x - timestamp_x >=  timestamp_x - timestamp 'epoch'  order by id limit 100;
+                                                                                      QUERY PLAN                                                                                       
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((strom_time_test.timestamp_x - strom_time_test.timestamp_x) >= (strom_time_test.timestamp_x - 'Thu Jan 01 00:00:00 1970'::timestamp without time zone))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date - 1 >=  timestamp with time zone 'epoch'::date - 1  order by id limit 100;
+                                                                     QUERY PLAN                                                                     
+----------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: (((strom_time_test.timestamp_x)::date - 1) >= (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date - 1))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date - '1 year'::interval >=  timestamp with time zone 'epoch'::date - '1 year'::interval order by id limit 100;
+                                                                                    QUERY PLAN                                                                                     
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: (((strom_time_test.timestamp_x)::date - '@ 1 year'::interval) >= (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date - '@ 1 year'::interval))
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x - time_x >=  time_x - timestamp with time zone 'epoch'::time  order by id limit 100;
+                                                                                            QUERY PLAN                                                                                             
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((strom_time_test.time_x - strom_time_test.time_x) >= (strom_time_test.time_x - ('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::time without time zone))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x + interval '1 hour' >=  timestamp with time zone 'epoch'::time + interval '1 hour'::interval order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x - '23 hours'::interval >=  timestamp with time zone 'epoch'::timestamp - '23 hours'::interval  order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x - '23 hours'::interval >=  interval_x - '23 hours'::interval - interval '1 seconds'  order by id limit 100;
+                                                                              QUERY PLAN                                                                               
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: timestamp_x, id
+               Device Filter: ((strom_time_test.interval_x - '@ 23 hours'::interval) >= ((strom_time_test.interval_x - '@ 23 hours'::interval) - '@ 1 sec'::interval))
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x * 12.35  >=  interval_x * 12.35 - interval '1 seconds' order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x / 12.35  >=  interval_x / 12.35 - interval '1 seconds' order by id limit 100;
+--# implicit cast test
+--# List of supported cast by PostgreSQL can display following query
+--# -----------------------------------------------------------------------------------
+--# SELECT castsource::regtype,casttarget::regtype,castfunc::regproc,castmethod from pg_cast 
+--# WHERE castsource in 
+--# ('timestamp'::regtype,'timestamptz'::regtype,'date'::regtype,'time'::regtype,'timetz'::regtype,'interval'::regtype) 
+--# AND casttarget not in ('abstime'::regtype,'reltime'::regtype);
+--# -----------------------------------------------------------------------------------
+explain (verbose, costs off, timing off) select  *    from strom_time_test where date_x=timestamp_x order by id limit 100;
+                                           QUERY PLAN                                            
+-------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Sort
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+               Device Filter: (strom_time_test.date_x = strom_time_test.timestamp_x)
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  *    from strom_time_test where date_x=timestamptz_x order by id limit 100;
+                                           QUERY PLAN                                            
+-------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Sort
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+               Device Filter: (strom_time_test.date_x = strom_time_test.timestamptz_x)
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  *    from strom_time_test where time_x=interval_x order by id limit 100;
+explain (verbose, costs off, timing off) select  *    from strom_time_test where time_x=timetz_x order by id limit 100;
+                                               QUERY PLAN                                                
+---------------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Sort
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+               Device Filter: ((strom_time_test.time_x)::time with time zone = strom_time_test.timetz_x)
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  *    from strom_time_test where timestamp_x=timestamptz_x order by id limit 100;
+                                           QUERY PLAN                                            
+-------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Sort
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+               Device Filter: (strom_time_test.timestamp_x = strom_time_test.timestamptz_x)
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  *    from strom_time_test where date_x!=timestamp_x order by id limit 100;
+                                           QUERY PLAN                                            
+-------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Sort
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+               Device Filter: (strom_time_test.date_x <> strom_time_test.timestamp_x)
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  *    from strom_time_test where date_x!=timestamptz_x order by id limit 100;
+                                           QUERY PLAN                                            
+-------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Sort
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+               Device Filter: (strom_time_test.date_x <> strom_time_test.timestamptz_x)
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+-- explain (verbose, costs off, timing off) select  *    from strom_time_test where time_x!=interval_x order by id limit 100;
+explain (verbose, costs off, timing off) select  *    from strom_time_test where time_x!=timetz_x order by id limit 100;
+                                                QUERY PLAN                                                
+----------------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Sort
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+               Device Filter: ((strom_time_test.time_x)::time with time zone <> strom_time_test.timetz_x)
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+explain (verbose, costs off, timing off) select  *    from strom_time_test where timestamp_x!=timestamptz_x order by id limit 100;
+                                           QUERY PLAN                                            
+-------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Sort
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Sort Key: strom_time_test.id
+         ->  Custom Scan (GpuScan) on public.strom_time_test
+               Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+               Device Filter: (strom_time_test.timestamp_x <> strom_time_test.timestamptz_x)
+               Features: format: tuple-slot, bulkload: supported
+(9 rows)
+
+--# AT TIME ZONE
+--# Not yet implemented on pg_strom
+-- explain (verbose, costs off, timing off) select  timestamp_x  from strom_time_test where timestamp_x AT TIME ZONE 'JST' = timestamp_x AT TIME ZONE 'JST' order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x  from strom_time_test where timestamptz_x AT TIME ZONE 'JST' = timestamptz_x AT TIME ZONE 'JST' order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x  from strom_time_test where timetz_x AT TIME ZONE 'JST' = timetz_x AT TIME ZONE 'JST' order by id limit 100;
+--# SUMMER TIME TEST
+set timezone='America/New_York';
+explain (verbose, costs off, timing off) SELECT * FROM strom_time_test WHERE key=1000 and '2015-03-08 3:00:00'::timestamp with time zone - interval '1 seconds' = timestamptz_x limit 10;
+                                                                                  QUERY PLAN                                                                                  
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Custom Scan (GpuScan) on public.strom_time_test
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Device Filter: ((strom_time_test.key = 1000) AND (('Sun Mar 08 03:00:00 2015 EDT'::timestamp with time zone - '@ 1 sec'::interval) = strom_time_test.timestamptz_x))
+         Features: format: tuple-slot, bulkload: supported
+(6 rows)
+
+set timezone to default;
+explain (verbose, costs off, timing off) SELECT * FROM strom_time_test WHERE key=1000 and '2015-03-08 3:00:00'::timestamp with time zone - interval '1 seconds' = timestamptz_x limit 10;
+                                                                                  QUERY PLAN                                                                                  
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Custom Scan (GpuScan) on public.strom_time_test
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Device Filter: ((strom_time_test.key = 1000) AND (('Sun Mar 08 03:00:00 2015 PDT'::timestamp with time zone - '@ 1 sec'::interval) = strom_time_test.timestamptz_x))
+         Features: format: tuple-slot, bulkload: supported
+(6 rows)
+
+--# #####  pg_strom = off #####
+set pg_strom.enabled=off;
+--# Following date/time function cannot yet use on GPU device filter.
+--# age,date_part,date_trunc,extract,isfinite,justify_days,make_date,make_interval,make_time,make_timestamp,make_timestamptz
+--# But now() function can use on GPU device.
+explain (verbose, costs off, timing off) select * from strom_time_test where timestamp_x < timestamp 'epoch' and timestamp_x < now() order by timestamp_x asc limit 100;
+                                                                        QUERY PLAN                                                                         
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Sort
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Sort Key: strom_time_test.timestamp_x
+         ->  Seq Scan on public.strom_time_test
+               Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+               Filter: ((strom_time_test.timestamp_x < 'Thu Jan 01 00:00:00 1970'::timestamp without time zone) AND (strom_time_test.timestamp_x < now()))
+(8 rows)
+
+explain (verbose, costs off, timing off) select * from strom_time_test where timestamp_x < timestamp 'epoch' and timestamptz_x < now() order by timestamptz_x asc limit 100;
+                                                                         QUERY PLAN                                                                          
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Sort
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Sort Key: strom_time_test.timestamptz_x
+         ->  Seq Scan on public.strom_time_test
+               Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+               Filter: ((strom_time_test.timestamp_x < 'Thu Jan 01 00:00:00 1970'::timestamp without time zone) AND (strom_time_test.timestamptz_x < now()))
+(8 rows)
+
+--# Operator test; (+,-,*,/) and overlaps. 
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + 1 = timestamp_x::date + 1 order by id limit 100;
+                                                  QUERY PLAN                                                   
+---------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: (((strom_time_test.timestamp_x)::date + 1) = ((strom_time_test.timestamp_x)::date + 1))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + '1 year'::interval = timestamp_x::date + '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + time '01:00' = timestamp_x::date + time '01:00' order by id limit 100;
+                                                                                   QUERY PLAN                                                                                    
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: (((strom_time_test.timestamp_x)::date + '01:00:00'::time without time zone) = ((strom_time_test.timestamp_x)::date + '01:00:00'::time without time zone))
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x + interval_x = interval_x + interval_x order by id limit 100;
+                                                                  QUERY PLAN                                                                   
+-----------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((strom_time_test.interval_x + strom_time_test.interval_x) = (strom_time_test.interval_x + strom_time_test.interval_x))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x + interval '1 year' = timestamp_x + interval '1 year'::interval order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x + '1 year'::interval = time_x + '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where - interval_x = - interval_x order by id limit 100;
+                                       QUERY PLAN                                        
+-----------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((- strom_time_test.interval_x) = (- strom_time_test.interval_x))
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x - timestamp_x = timestamp_x - timestamp_x  order by id limit 100;
+                                                                    QUERY PLAN                                                                     
+---------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((strom_time_test.timestamp_x - strom_time_test.timestamp_x) = (strom_time_test.timestamp_x - strom_time_test.timestamp_x))
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date - 1 = timestamp_x::date - 1  order by id limit 100;
+                                                  QUERY PLAN                                                   
+---------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: (((strom_time_test.timestamp_x)::date - 1) = ((strom_time_test.timestamp_x)::date - 1))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date - '1 year'::interval = timestamp_x::date - '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x - time_x = time_x - time_x  order by id limit 100;
+                                                          QUERY PLAN                                                           
+-------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((strom_time_test.time_x - strom_time_test.time_x) = (strom_time_test.time_x - strom_time_test.time_x))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x + interval '1 hour' = time_x + interval '1 hour'::interval order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x - '23 hours'::interval = timestamp_x - '23 hours'::interval  order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x - '23 hours'::interval = interval_x - '23 hours'::interval  order by id limit 100;
+                                                              QUERY PLAN                                                               
+---------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((strom_time_test.interval_x - '@ 23 hours'::interval) = (strom_time_test.interval_x - '@ 23 hours'::interval))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x * 12.35  = interval_x * 12.35  order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x / 12.35  = interval_x / 12.35  order by id limit 100;
+--# overlaps
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where (timestamp_x,now()) overlaps (timestamp_x,now()) order by id limit 100;
+                                                                            QUERY PLAN                                                                            
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: "overlaps"((strom_time_test.timestamp_x)::timestamp with time zone, now(), (strom_time_test.timestamp_x)::timestamp with time zone, now())
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where (timestamp_x,now()) overlaps (timestamp with time zone 'epoch'::timestamp,now()) order by id limit 100;
+                                                                                                          QUERY PLAN                                                                                                          
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: "overlaps"((strom_time_test.timestamp_x)::timestamp with time zone, now(), (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::timestamp without time zone)::timestamp with time zone, now())
+(8 rows)
+
+--# Operator test; (<, <=, >, >=)
+--# < 
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + 1 < timestamp with time zone 'epoch'::date + 1 order by id limit 100;
+                                                                 QUERY PLAN                                                                 
+--------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: (((strom_time_test.timestamp_x)::date + 1) < (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date + 1))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + '1 year'::interval < timestamp with time zone 'epoch'::date + '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + time '01:00' < timestamp with time zone 'epoch'::date + time '01:00' order by id limit 100;
+                                                                                                  QUERY PLAN                                                                                                  
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: (((strom_time_test.timestamp_x)::date + '01:00:00'::time without time zone) < (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date + '01:00:00'::time without time zone))
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x + interval_x < interval_x + interval_x + interval '1 seconds' order by id limit 100;
+                                                                              QUERY PLAN                                                                               
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((strom_time_test.interval_x + strom_time_test.interval_x) < ((strom_time_test.interval_x + strom_time_test.interval_x) + '@ 1 sec'::interval))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x + interval '1 year' < timestamp with time zone 'epoch' + interval '1 year'::interval order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x + '1 year'::interval < timestamp with time zone 'epoch'::time + '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where - interval_x < - interval_x + interval '1 seconds' order by id limit 100;
+                                                   QUERY PLAN                                                    
+-----------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((- strom_time_test.interval_x) < ((- strom_time_test.interval_x) + '@ 1 sec'::interval))
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x - timestamp_x < timestamp_x - timestamp 'epoch'  order by id limit 100;
+                                                                                  QUERY PLAN                                                                                   
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((strom_time_test.timestamp_x - strom_time_test.timestamp_x) < (strom_time_test.timestamp_x - 'Thu Jan 01 00:00:00 1970'::timestamp without time zone))
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date - 1 < timestamp with time zone 'epoch'::date - 1  order by id limit 100;
+                                                                 QUERY PLAN                                                                 
+--------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: (((strom_time_test.timestamp_x)::date - 1) < (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date - 1))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date - '1 year'::interval < timestamp with time zone 'epoch'::date - '1 year'::interval order by id limit 100; 
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x - time_x < time_x - timestamp with time zone 'epoch'::time  order by id limit 100;
+                                                                                        QUERY PLAN                                                                                         
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((strom_time_test.time_x - strom_time_test.time_x) < (strom_time_test.time_x - ('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::time without time zone))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x + interval '1 hour' < timestamp with time zone 'epoch'::time + interval '1 hour'::interval order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x - '23 hours'::interval < timestamp with time zone 'epoch'::timestamp - '23 hours'::interval  order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x - '23 hours'::interval < interval_x - '23 hours'::interval + interval '1 seconds'  order by id limit 100;
+                                                                          QUERY PLAN                                                                           
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((strom_time_test.interval_x - '@ 23 hours'::interval) < ((strom_time_test.interval_x - '@ 23 hours'::interval) + '@ 1 sec'::interval))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x * 12.35  < interval_x * 12.35 + interval '1 seconds' order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x / 12.35  < interval_x / 12.35 + interval '1 seconds' order by id limit 100;
+--# <= 
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + 1 <= timestamp with time zone 'epoch'::date + 1 order by id limit 100;
+                                                                 QUERY PLAN                                                                  
+---------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: (((strom_time_test.timestamp_x)::date + 1) <= (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date + 1))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + '1 year'::interval <= timestamp with time zone 'epoch'::date + '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + time '01:00' <= timestamp with time zone 'epoch'::date + time '01:00' order by id limit 100;
+                                                                                                  QUERY PLAN                                                                                                   
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: (((strom_time_test.timestamp_x)::date + '01:00:00'::time without time zone) <= (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date + '01:00:00'::time without time zone))
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x + interval_x <= interval_x + interval_x + interval '1 seconds' order by id limit 100;
+                                                                               QUERY PLAN                                                                               
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((strom_time_test.interval_x + strom_time_test.interval_x) <= ((strom_time_test.interval_x + strom_time_test.interval_x) + '@ 1 sec'::interval))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x + interval '1 year' <= timestamp with time zone 'epoch' + interval '1 year'::interval order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x + '1 year'::interval <= timestamp with time zone 'epoch'::time + '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where - interval_x <= - interval_x + interval '1 seconds' order by id limit 100;
+                                                    QUERY PLAN                                                    
+------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((- strom_time_test.interval_x) <= ((- strom_time_test.interval_x) + '@ 1 sec'::interval))
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x - timestamp_x <= timestamp_x - timestamp 'epoch'  order by id limit 100;
+                                                                                   QUERY PLAN                                                                                   
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((strom_time_test.timestamp_x - strom_time_test.timestamp_x) <= (strom_time_test.timestamp_x - 'Thu Jan 01 00:00:00 1970'::timestamp without time zone))
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date - 1 <= timestamp with time zone 'epoch'::date - 1  order by id limit 100;
+                                                                 QUERY PLAN                                                                  
+---------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: (((strom_time_test.timestamp_x)::date - 1) <= (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date - 1))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date - '1 year'::interval <= timestamp with time zone 'epoch'::date - '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x - time_x <= time_x - timestamp with time zone 'epoch'::time  order by id limit 100;
+                                                                                         QUERY PLAN                                                                                         
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((strom_time_test.time_x - strom_time_test.time_x) <= (strom_time_test.time_x - ('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::time without time zone))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x + interval '1 hour' <= timestamp with time zone 'epoch'::time + interval '1 hour'::interval order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x - '23 hours'::interval <= timestamp with time zone 'epoch'::timestamp - '23 hours'::interval  order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x - '23 hours'::interval <= interval_x - '23 hours'::interval + interval '1 seconds'  order by id limit 100;
+                                                                           QUERY PLAN                                                                           
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((strom_time_test.interval_x - '@ 23 hours'::interval) <= ((strom_time_test.interval_x - '@ 23 hours'::interval) + '@ 1 sec'::interval))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x * 12.35  <= interval_x * 12.35 + interval '1 seconds' order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x / 12.35  <= interval_x / 12.35 + interval '1 seconds' order by id limit 100;
+--# >  
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + 1 >  timestamp with time zone 'epoch'::date + 1 order by id limit 100;
+                                                                 QUERY PLAN                                                                 
+--------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: (((strom_time_test.timestamp_x)::date + 1) > (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date + 1))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + '1 year'::interval >  timestamp with time zone 'epoch'::date + '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + time '01:00' >  timestamp with time zone 'epoch'::date + time '01:00' order by id limit 100;
+                                                                                                  QUERY PLAN                                                                                                  
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: (((strom_time_test.timestamp_x)::date + '01:00:00'::time without time zone) > (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date + '01:00:00'::time without time zone))
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x + interval_x >  interval_x + interval_x - interval '1 seconds' order by id limit 100;
+                                                                              QUERY PLAN                                                                               
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((strom_time_test.interval_x + strom_time_test.interval_x) > ((strom_time_test.interval_x + strom_time_test.interval_x) - '@ 1 sec'::interval))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x + interval '1 year' >  timestamp with time zone 'epoch' + interval '1 year'::interval order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x + '1 year'::interval >  timestamp with time zone 'epoch'::time + '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where - interval_x >  - interval_x - interval '1 seconds' order by id limit 100;
+                                                   QUERY PLAN                                                    
+-----------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((- strom_time_test.interval_x) > ((- strom_time_test.interval_x) - '@ 1 sec'::interval))
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x - timestamp_x >  timestamp_x - timestamp 'epoch'  order by id limit 100;
+                                                                                  QUERY PLAN                                                                                   
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((strom_time_test.timestamp_x - strom_time_test.timestamp_x) > (strom_time_test.timestamp_x - 'Thu Jan 01 00:00:00 1970'::timestamp without time zone))
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date - 1 >  timestamp with time zone 'epoch'::date - 1  order by id limit 100;
+                                                                 QUERY PLAN                                                                 
+--------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: (((strom_time_test.timestamp_x)::date - 1) > (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date - 1))
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date - '1 year'::interval >  timestamp with time zone 'epoch'::date - '1 year'::interval order by id limit 100;
+                                                                                    QUERY PLAN                                                                                    
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: (((strom_time_test.timestamp_x)::date - '@ 1 year'::interval) > (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date - '@ 1 year'::interval))
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x - time_x >  time_x - timestamp with time zone 'epoch'::time  order by id limit 100;
+                                                                                        QUERY PLAN                                                                                         
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((strom_time_test.time_x - strom_time_test.time_x) > (strom_time_test.time_x - ('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::time without time zone))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x + interval '1 hour' >  timestamp with time zone 'epoch'::time + interval '1 hour'::interval order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x - '23 hours'::interval >  timestamp with time zone 'epoch'::timestamp - '23 hours'::interval  order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x - '23 hours'::interval >  interval_x - '23 hours'::interval - interval '1 seconds'  order by id limit 100;
+                                                                          QUERY PLAN                                                                           
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((strom_time_test.interval_x - '@ 23 hours'::interval) > ((strom_time_test.interval_x - '@ 23 hours'::interval) - '@ 1 sec'::interval))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x * 12.35  >  interval_x * 12.35 - interval '1 seconds' order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x / 12.35  >  interval_x / 12.35 - interval '1 seconds' order by id limit 100;
+--# >=  
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + 1 >=  timestamp with time zone 'epoch'::date + 1 order by id limit 100;
+                                                                 QUERY PLAN                                                                  
+---------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: (((strom_time_test.timestamp_x)::date + 1) >= (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date + 1))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + '1 year'::interval >=  timestamp with time zone 'epoch'::date + '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date + time '01:00' >=  timestamp with time zone 'epoch'::date + time '01:00' order by id limit 100;
+                                                                                                  QUERY PLAN                                                                                                   
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: (((strom_time_test.timestamp_x)::date + '01:00:00'::time without time zone) >= (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date + '01:00:00'::time without time zone))
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x + interval_x >=  interval_x + interval_x - interval '1 seconds' order by id limit 100;
+                                                                               QUERY PLAN                                                                               
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((strom_time_test.interval_x + strom_time_test.interval_x) >= ((strom_time_test.interval_x + strom_time_test.interval_x) - '@ 1 sec'::interval))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x + interval '1 year' >=  timestamp with time zone 'epoch' + interval '1 year'::interval order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x + '1 year'::interval >=  timestamp with time zone 'epoch'::time + '1 year'::interval order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where - interval_x >=  - interval_x - interval '1 seconds' order by id limit 100;
+                                                    QUERY PLAN                                                    
+------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((- strom_time_test.interval_x) >= ((- strom_time_test.interval_x) - '@ 1 sec'::interval))
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x - timestamp_x >=  timestamp_x - timestamp 'epoch'  order by id limit 100;
+                                                                                   QUERY PLAN                                                                                   
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((strom_time_test.timestamp_x - strom_time_test.timestamp_x) >= (strom_time_test.timestamp_x - 'Thu Jan 01 00:00:00 1970'::timestamp without time zone))
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date - 1 >=  timestamp with time zone 'epoch'::date - 1  order by id limit 100;
+                                                                 QUERY PLAN                                                                  
+---------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: (((strom_time_test.timestamp_x)::date - 1) >= (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date - 1))
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x::date - '1 year'::interval >=  timestamp with time zone 'epoch'::date - '1 year'::interval order by id limit 100;
+                                                                                    QUERY PLAN                                                                                     
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: (((strom_time_test.timestamp_x)::date - '@ 1 year'::interval) >= (('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::date - '@ 1 year'::interval))
+(8 rows)
+
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x - time_x >=  time_x - timestamp with time zone 'epoch'::time  order by id limit 100;
+                                                                                         QUERY PLAN                                                                                         
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((strom_time_test.time_x - strom_time_test.time_x) >= (strom_time_test.time_x - ('Wed Dec 31 16:00:00 1969 PST'::timestamp with time zone)::time without time zone))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where time_x + interval '1 hour' >=  timestamp with time zone 'epoch'::time + interval '1 hour'::interval order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where timestamp_x - '23 hours'::interval >=  timestamp with time zone 'epoch'::timestamp - '23 hours'::interval  order by id limit 100;
+explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x - '23 hours'::interval >=  interval_x - '23 hours'::interval - interval '1 seconds'  order by id limit 100;
+                                                                           QUERY PLAN                                                                           
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: timestamp_x, id
+   ->  Sort
+         Output: timestamp_x, id
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: timestamp_x, id
+               Filter: ((strom_time_test.interval_x - '@ 23 hours'::interval) >= ((strom_time_test.interval_x - '@ 23 hours'::interval) - '@ 1 sec'::interval))
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x * 12.35  >=  interval_x * 12.35 - interval '1 seconds' order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x    from strom_time_test where interval_x / 12.35  >=  interval_x / 12.35 - interval '1 seconds' order by id limit 100;
+--# implicit cast test
+--# List of supported cast by PostgreSQL can display following query
+--# -----------------------------------------------------------------------------------
+--# SELECT castsource::regtype,casttarget::regtype,castfunc::regproc,castmethod from pg_cast 
+--# WHERE castsource in 
+--# ('timestamp'::regtype,'timestamptz'::regtype,'date'::regtype,'time'::regtype,'timetz'::regtype,'interval'::regtype) 
+--# AND casttarget not in ('abstime'::regtype,'reltime'::regtype);
+--# -----------------------------------------------------------------------------------
+explain (verbose, costs off, timing off) select  *    from strom_time_test where date_x=timestamp_x order by id limit 100;
+                                           QUERY PLAN                                            
+-------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Sort
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+               Filter: (strom_time_test.date_x = strom_time_test.timestamp_x)
+(8 rows)
+
+explain (verbose, costs off, timing off) select  *    from strom_time_test where date_x=timestamptz_x order by id limit 100;
+                                           QUERY PLAN                                            
+-------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Sort
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+               Filter: (strom_time_test.date_x = strom_time_test.timestamptz_x)
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  *    from strom_time_test where time_x=interval_x order by id limit 100;
+explain (verbose, costs off, timing off) select  *    from strom_time_test where time_x=timetz_x order by id limit 100;
+                                            QUERY PLAN                                            
+--------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Sort
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+               Filter: ((strom_time_test.time_x)::time with time zone = strom_time_test.timetz_x)
+(8 rows)
+
+explain (verbose, costs off, timing off) select  *    from strom_time_test where timestamp_x=timestamptz_x order by id limit 100;
+                                           QUERY PLAN                                            
+-------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Sort
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+               Filter: (strom_time_test.timestamp_x = strom_time_test.timestamptz_x)
+(8 rows)
+
+explain (verbose, costs off, timing off) select  *    from strom_time_test where date_x!=timestamp_x order by id limit 100;
+                                           QUERY PLAN                                            
+-------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Sort
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+               Filter: (strom_time_test.date_x <> strom_time_test.timestamp_x)
+(8 rows)
+
+explain (verbose, costs off, timing off) select  *    from strom_time_test where date_x!=timestamptz_x order by id limit 100;
+                                           QUERY PLAN                                            
+-------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Sort
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+               Filter: (strom_time_test.date_x <> strom_time_test.timestamptz_x)
+(8 rows)
+
+-- explain (verbose, costs off, timing off) select  *    from strom_time_test where time_x!=interval_x order by id limit 100;
+explain (verbose, costs off, timing off) select  *    from strom_time_test where time_x!=timetz_x order by id limit 100;
+                                            QUERY PLAN                                             
+---------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Sort
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+               Filter: ((strom_time_test.time_x)::time with time zone <> strom_time_test.timetz_x)
+(8 rows)
+
+explain (verbose, costs off, timing off) select  *    from strom_time_test where timestamp_x!=timestamptz_x order by id limit 100;
+                                           QUERY PLAN                                            
+-------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Sort
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Sort Key: strom_time_test.id
+         ->  Seq Scan on public.strom_time_test
+               Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+               Filter: (strom_time_test.timestamp_x <> strom_time_test.timestamptz_x)
+(8 rows)
+
+--# AT TIME ZONE
+--# Not yet implemented on pg_strom
+-- explain (verbose, costs off, timing off) select  timestamp_x  from strom_time_test where timestamp_x AT TIME ZONE 'JST' = timestamp_x AT TIME ZONE 'JST' order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x  from strom_time_test where timestamptz_x AT TIME ZONE 'JST' = timestamptz_x AT TIME ZONE 'JST' order by id limit 100;
+-- explain (verbose, costs off, timing off) select  timestamp_x  from strom_time_test where timetz_x AT TIME ZONE 'JST' = timetz_x AT TIME ZONE 'JST' order by id limit 100;
+--# SUMMER TIME TEST
+set timezone='America/New_York';
+explain (verbose, costs off, timing off) SELECT * FROM strom_time_test WHERE key=1000 and '2015-03-08 3:00:00'::timestamp with time zone - interval '1 seconds' = timestamptz_x limit 10;
+                                                                              QUERY PLAN                                                                               
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Seq Scan on public.strom_time_test
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Filter: ((strom_time_test.key = 1000) AND (('Sun Mar 08 03:00:00 2015 EDT'::timestamp with time zone - '@ 1 sec'::interval) = strom_time_test.timestamptz_x))
+(5 rows)
+
+set timezone to default;
+explain (verbose, costs off, timing off) SELECT * FROM strom_time_test WHERE key=1000 and '2015-03-08 3:00:00'::timestamp with time zone - interval '1 seconds' = timestamptz_x limit 10;
+                                                                              QUERY PLAN                                                                               
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit
+   Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+   ->  Seq Scan on public.strom_time_test
+         Output: id, key, timestamp_x, timestamptz_x, date_x, time_x, timetz_x, interval_x
+         Filter: ((strom_time_test.key = 1000) AND (('Sun Mar 08 03:00:00 2015 PDT'::timestamp with time zone - '@ 1 sec'::interval) = strom_time_test.timestamptz_x))
+(5 rows)
 
