@@ -40,3 +40,9 @@ test: explain_gso normal_gso group_gso multikey_gso text_gso zero_gso time_gso
 #test: merge_gso
 # GpuSort closed issue test-cases.
 test: 2+key_gso
+
+# ----------
+# GpuNestLoop pattern
+# ----------
+# GpuNestLoop parallel test-cases.
+test: explain_gnl normal_gnl
